@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "aws-service-operator.fullname" . }}
+  labels:
+    app: {{ include "aws-service-operator.name" . }}
+    chart: {{ include "aws-service-operator.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        iam.amazonaws.com/role: "arn:aws:iam::{{ .Values.operator.account }}:role/aws-service-operator"
+      labels:
+        app: {{ include "aws-service-operator.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: aws-service-operator
+      containers:
+      - name: aws-service-operator
+        image: awsserviceoperator/aws-service-operator:v0.0.1-alpha2
+        imagePullPolicy: Always
+        args:
+          - server
+          - --cluster-name={{ .Values.operator.cluster }}
+          - --region={{ .Values.operator.region }}
+          - --account-id={{ .Values.operator.account }}

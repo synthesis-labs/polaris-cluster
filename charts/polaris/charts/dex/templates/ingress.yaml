@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "dex.fullname" . }}
+  labels:
+    app: {{ template "dex.name" . }}
+    chart: {{ template "dex.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+   rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+         paths:
+          - path: /
+            backend:
+               serviceName: {{ template "dex.fullname" . }}
+               servicePort: {{ .Values.service.port }}
+   tls:
+    - hosts:
+      - {{ .Values.ingress.host }}

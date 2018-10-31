@@ -1,0 +1,55 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: retail-devops-binding
+subjects:
+- kind: User
+  name: retail@example.com
+roleRef:
+  kind: ClusterRole
+  name: cluster-devops
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: retail-devops
+  namespace: retail
+rules:
+#
+# Allow listing pods and their logs
+#
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "watch", "list"]
+#
+# Allow attaching to pods, but not necessarily exec'ing (unless attaching to a shell obviously)
+#
+- apiGroups: [""]
+  resources: ["pods/attach"]
+  verbs: ["create"]
+#
+# Allow creating and modifying of deployments
+#
+- apiGroups: ["apps", "extensions"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+#
+# Allow list of secrets, but not their contents (get)
+#
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["watch", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: retail-devops-binding
+  namespace: retail
+subjects:
+- kind: User
+  name: retail@example.com
+roleRef:
+  kind: Role
+  name: retail-devops
+  apiGroup: rbac.authorization.k8s.io

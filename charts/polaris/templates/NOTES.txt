@@ -1,0 +1,10 @@
+              .__               .__
+______   ____ |  | _____ _______|__| ______
+\____ \ /  _ \|  | \__  \\_  __ \  |/  ___/
+|  |_> >  <_> )  |__/ __ \|  | \/  |\___ \
+|   __/ \____/|____(____  /__|  |__/____  >
+|__|                    \/ by synthesis \/
+
+Fullname:  {{ include "polaris.fullname" . }}
+Name:      {{ include "polaris.name" . }}
+Namespace: {{ .Release.Namespace }}
