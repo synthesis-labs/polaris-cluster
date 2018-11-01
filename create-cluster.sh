@@ -1,6 +1,6 @@
 
 CLUSTER_NAME=example.cluster.k8s # name of the cluster
-STATE_BUCKET=kops-state-bucket # name of s3 bucket where the state of the cluster will live
+STATE_BUCKET="" # name of s3 bucket where the state of the cluster will live
 REGION=eu-west-1  
 AVAILABILITY_ZONES=${REGION}a,${REGION}b,${REGION}c # select AZ's - depending on the region but some may only have 2
 KUBERNETES_VERSION=1.10.5 
