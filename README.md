@@ -160,7 +160,9 @@ kubectl create namespace polaris
 kubectl apply -f k8/serviceaccounts/tiller-serviceaccount.yaml
 helm init --service-account helm-tiller --upgrade --debug --wait
 
-helm upgrade --namespace polaris --install polaris k8/charts/polaris
+helm upgrade --namespace polaris --install polaris-prometheus-operator charts/prometheus-operator-0.0.29.tgz
+
+helm upgrade --namespace polaris --install polaris charts/polaris
 ```
 
 6. Setup DEX
