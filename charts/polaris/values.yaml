@@ -97,7 +97,7 @@ dex-k8s-authenticator:
       #
       # Make this particular link public in s3:
       k8s_ca_uri:
-        https://s3.amazonaws.com/kops-state-bucket/example.cluster.k8s/pki/issued/ca/123412341234.crt # url to CA cert on s3
+        https://s3.eu-west-1.amazonaws.com/kops-state-bucket/example.cluster.k8s/pki/issued/ca/123412341234.crt # url to CA cert on s3
   caCerts:
     enabled: true
     secrets:
