@@ -1,0 +1,118 @@
+
+global:
+  cluster-name: example.cluster.k8s
+
+aws-service-operator:
+  operator:
+    account: "123412341234"
+    cluster: example       # Can't contain any weird characters!
+    region: eu-west-1
+
+external-dns:
+  image:
+    name: registry.opensource.zalan.do/teapot/external-dns
+    tag: v0.5.4
+  logLevel: debug
+  rbac:
+    create: true
+
+cluster-autoscaler:
+  rbac:
+    create: true
+  cloudProvider: aws
+  awsRegion: eu-west-1
+  autoscalingGroups:
+   - name: nodes.example.cluster.k8s
+     minSize: 1
+     maxSize: 6
+
+nginx-ingress:
+  rbac:
+    create: true
+  controller:
+    publishService:
+      enabled: true
+    extraArgs:
+      enable-ssl-passthrough: true
+
+flux:
+  helmOperator:
+    create: truer
+    git:
+      chartsPath: "example/cluster-repo/charts"
+  git:
+    url: "" # url for git repo
+    branch: "master" 
+    path: "example/cluster-repo/" # directories to watch
+    user: "Flux on Example"
+    email: "flux@example.com"
+    setAuthor: true
+    pollInterval: "1m"
+  registry:
+    pollInterval: "1m"
+
+dex:
+  secret:
+    tlsName: dex-tls
+    caName: dex-ca
+  ingress:
+     host: dex.example.cluster.k8s
+  config:
+    issuer: https://dex.example.cluster.k8s
+    connectors: []
+    staticClients:
+    - id: kubectl-access
+      redirectURIs:
+      - 'http://127.0.0.1:5555/callback'
+      - 'https://login.example.cluster.k8s/callback/example.cluster.k8s'
+      name: 'Kubectl Access'
+      secret: "" # set this and match it with dexK8sAuthenticator.clusters[0].client_secret
+    enablePasswordDB: true
+    staticPasswords:
+    - email: "admin@example.com"
+      # bcrypt hash of the string "password"
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+    - email: "retail@example.com"
+      # bcrypt hash of the string "password"
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "retail"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5467"
+
+dex-k8s-authenticator:
+  dexK8sAuthenticator:
+    port: 5555
+    debug: false
+    web_path_prefix: /
+    clusters:
+    - name: example.cluster.k8s
+      short_description: "example Cluster"
+      description: "Example cluster"
+      client_secret: ""
+      issuer: https://dex.example.cluster.k8s
+      k8s_master_uri: https://api.example.cluster.k8s
+      client_id: kubectl-access
+      redirect_uri: https://login.example.cluster.k8s/callback/example.cluster.k8s
+      #
+      # Make this particular link public in s3:
+      k8s_ca_uri:
+        https://s3.eu-west-1.amazonaws.com/kops-state-bucket/example.cluster.k8s/pki/issued/ca/123412341234.crt # url to CA cert on s3
+  caCerts:
+    enabled: true
+    secrets:
+    # Get this value by: cat dex/ca/dex-ca-cert.pem | base64 [-w 0]
+    - name: ca1
+      filename: ca1.crt
+      value: ""
+  ingress:
+    enabled: true
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    path: /
+    hosts:
+      - login.example.cluster.k8s
+    tls:
+      - hosts:
+        - login.example.cluster.k8s

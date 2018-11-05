@@ -1,0 +1,16 @@
+NAME            URL
+stable          https://kubernetes-charts.storage.googleapis.com
+local           http://127.0.0.1:8879/charts
+incubator       http://storage.googleapis.com/kubernetes-charts-incubator
+coreos          https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+brigade         https://azure.github.io/brigade
+weaveworks      https://weaveworks.github.io/flux
+
+stable/external-dns
+stable/cluster-autoscaler
+stable/nginx-ingress
+stable/metrics-server
+coreos/kube-prometheus
+coreos/prometheus-operator
+stable/dex
+weaveworks/flux

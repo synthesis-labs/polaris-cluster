@@ -1,0 +1,14 @@
+appVersion: 2.10.1
+description: CoreOS Dex
+home: https://github.com/coreos/dex/
+icon: https://github.com/coreos/dex/raw/master/Documentation/logos/dex-glyph-color.png
+keywords:
+- dex
+- oidc
+maintainers:
+- email: Kevin.Fox@pnnl.gov
+  name: kfox1111
+- email: shane.starcher@gmail.com
+  name: sstarcher
+name: dex
+version: 0.1.0
