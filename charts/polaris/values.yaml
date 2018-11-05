@@ -59,26 +59,26 @@ dex:
      host: dex.example.cluster.k8s
   config:
     issuer: https://dex.example.cluster.k8s
-  connectors: []
-  staticClients:
-  - id: kubectl-access
-    redirectURIs:
-    - 'http://127.0.0.1:5555/callback'
-    - 'https://login.example.cluster.k8s/callback/example.cluster.k8s'
-    name: 'Kubectl Access'
-    secret: "" # set this and match it with dexK8sAuthenticator.clusters[0].client_secret
-  enablePasswordDB: true
-  staticPasswords:
-  - email: "admin@example.com"
-    # bcrypt hash of the string "password"
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
-    username: "admin"
-    userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
-  - email: "retail@example.com"
-    # bcrypt hash of the string "password"
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
-    username: "retail"
-    userID: "08a8684b-db88-4b73-90a9-3cd1661f5467"
+    connectors: []
+    staticClients:
+    - id: kubectl-access
+      redirectURIs:
+      - 'http://127.0.0.1:5555/callback'
+      - 'https://login.example.cluster.k8s/callback/example.cluster.k8s'
+      name: 'Kubectl Access'
+      secret: "" # set this and match it with dexK8sAuthenticator.clusters[0].client_secret
+    enablePasswordDB: true
+    staticPasswords:
+    - email: "admin@example.com"
+      # bcrypt hash of the string "password"
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+    - email: "retail@example.com"
+      # bcrypt hash of the string "password"
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "retail"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5467"
 
 dex-k8s-authenticator:
   dexK8sAuthenticator:
