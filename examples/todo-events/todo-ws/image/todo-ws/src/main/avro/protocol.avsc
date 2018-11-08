@@ -1,0 +1,212 @@
+[
+    {
+       "namespace": "protocol",
+       "name": "BlueprintValueType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "value",
+           "type" : "string"
+         }
+       ]
+    },
+    {
+       "namespace": "protocol",
+       "name": "BlueprintKeyType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "key",
+           "type" : "string"
+         }
+       ]
+    },
+    {
+       "namespace": "protocol",
+       "name": "TodoType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "description",
+           "type" : "string"
+         },
+         {
+           "name" : "state",
+           "type" : "string"
+         }
+       ]
+    },
+    {
+        "namespace" : "protocol",
+        "name" : "StatusType",
+        "type" : "enum",
+        "symbols" : ["ACTIVE", "DELETED"]
+    },
+    {
+        "namespace" : "protocol",
+        "name" : "ItemStatusType",
+        "type": "enum",
+        "symbols" : ["ACTIVE", "COMPLETED", "DELETED"]
+    },
+    {
+       "namespace": "protocol",
+       "name": "ListType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "name",
+           "type" : "string"
+         },
+         {
+            "name" : "status",
+            "type" : "StatusType"
+         }
+       ]
+    },
+    {
+       "namespace": "protocol",
+       "name": "ItemType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "name",
+           "type" : "string"
+         },
+         {
+            "name" : "status",
+            "type" : "ItemStatusType"
+         },
+         {
+           "name" : "list",
+           "type" : "string"
+         },
+         {
+           "name" : "tags",
+           "type" : {
+              "type": "array",
+              "items" : "string"
+           }
+         }
+       ]
+    },
+    {
+        "namespace" : "protocol",
+        "name" : "ListCommandActionType",
+        "type": "enum",
+        "symbols" : ["CREATE_LIST", "DELETE_LIST", "UPDATE_LIST"]
+    },
+    {
+       "namespace": "protocol",
+       "name": "ListCommandType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "action",
+           "type" : "ListCommandActionType"
+         },
+         {
+            "name" : "list",
+            "type" : "ListType"
+         }
+       ]
+    },
+    {
+        "namespace" : "protocol",
+        "name" : "ItemCommandActionType",
+        "type": "enum",
+        "symbols" : ["CREATE_ITEM", "DELETE_ITEM", "UPDATE_ITEM", "COMPLETE_ITEM", "UNCOMPLETE_ITEM"]
+    },
+    {
+       "namespace": "protocol",
+       "name": "ItemCommandType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "action",
+           "type" : "ItemCommandActionType"
+         },
+         {
+            "name" : "item",
+            "type" : "ItemType"
+         }
+       ]
+    },
+    {
+        "namespace" : "protocol",
+        "name" : "TagCommandActionType",
+        "type": "enum",
+        "symbols" : ["TAG_ITEM", "UNTAG_ITEM"]
+    },
+    {
+       "namespace": "protocol",
+       "name": "TagCommandType",
+       "type": "record",
+       "fields" : [
+         {
+           "name" : "action",
+           "type" : "TagCommandActionType"
+         },
+         {
+            "name" : "item",
+            "type" : "ItemType"
+         },
+         {
+            "name" : "tag",
+            "type" : "string"
+         }
+       ]
+    },
+    {
+       "namespace": "protocol",
+       "name": "CommandType",
+       "type": "record",
+       "fields": [
+         {
+            "name": "command",
+            "type": ["ListCommandType", "ItemCommandType", "TagCommandType"]
+         }
+       ]
+    },
+  {
+    "namespace" : "protocol.list",
+    "name" : "ListCommandAction",
+    "type": "enum",
+    "symbols" : ["CREATE", "DELETE", "UPDATE", "MARK_COMPLETED", "MARK_UNCOMPLETED"]
+  },
+  {
+    "namespace": "protocol.list",
+    "name": "ListCommand",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "action",
+        "type" : "ListCommandAction"
+      },
+      {
+        "name" : "name",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace" : "protocol.list",
+    "name" : "ListStatus",
+    "type" : "enum",
+    "symbols" : ["ACTIVE", "DELETED"]
+  },
+  {
+    "namespace": "protocol.list",
+    "name": "List",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "name",
+        "type" : "string"
+      },
+      {
+        "name" : "status",
+        "type" : "ListStatus"
+      }
+    ]
+  }
+]

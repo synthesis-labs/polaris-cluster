@@ -1,0 +1,25 @@
+
+replicaCount: 1
+
+operator:
+  todo_list_commands: todo-list-commands
+  todo_lists: todo-lists
+
+  kafka_bootstrap_servers: cp-kafka:9092
+  schema_registry_url: "http://cp-kafka-cp-schema-registry:8081"
+
+ecr:
+  repository: todo-ws
+
+image:
+  repository: 166813201744.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+  tag: v1.0.0
+  pullPolicy: Always
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

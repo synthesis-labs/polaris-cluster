@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kafka-topics-ui.fullname" . }}
+  labels:
+    app: {{ template "kafka-topics-ui.name" . }}
+    chart: {{ template "kafka-topics-ui.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "kafka-topics-ui.name" . }}
+    release: {{ .Release.Name }}

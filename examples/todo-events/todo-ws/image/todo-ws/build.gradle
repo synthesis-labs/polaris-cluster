@@ -1,0 +1,59 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'idea'
+
+// The bits that compiles the Avro (.avsc) schema files to java pojos
+//
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:0.15.0"
+    }
+}
+apply plugin: "com.commercehub.gradle.plugin.avro"
+
+sourceCompatibility = 1.8
+
+repositories {
+    // For io.confluent.kafka dependencies
+    //
+    maven { url 'https://packages.confluent.io/maven/' }
+
+    // Primarily for the gradle-avro-plugin
+    //
+    jcenter()
+
+    // For most other stuff
+    //
+    mavenCentral()
+}
+
+dependencies {
+    // For kafka streams
+    //
+    compile('org.apache.kafka:kafka-streams:2.0.0-cp1')
+    compile('org.apache.kafka:kafka-clients:2.0.0-cp1')
+
+    // Avro and Schema registry
+    //
+    compile('io.confluent:kafka-streams-avro-serde:5.0.0')
+    compile('io.confluent:kafka-avro-serializer:5.0.0')
+    compile('io.confluent:kafka-schema-registry-client:5.0.0')
+    compile('org.apache.avro:avro:1.8.2')
+
+    // Logging
+    //
+    compile('org.apache.logging.log4j:log4j-slf4j-impl:2.11.0')
+
+    // Websockets
+    //
+    compile('javax.websocket:javax.websocket-api:1.1')
+    compile('org.eclipse.jetty.websocket:javax-websocket-server-impl:9.2.7.v20150116')
+    compile('com.google.code.gson:gson:2.8.0')
+}
+
+// Application main class name
+//
+mainClassName = "TodoWs"

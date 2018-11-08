@@ -1,0 +1,9 @@
+apiVersion: service-operator.aws/v1alpha1
+kind: ECRRepository
+metadata:
+  name: {{ .Values.ecr.repository }}
+  labels:
+    app: {{ template "todo-ws.name" . }}
+    chart: {{ template "todo-ws.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
