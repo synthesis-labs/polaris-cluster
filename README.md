@@ -12,25 +12,53 @@ ______   ____ |  | _____ _______|__| ______
 
 ```
 
-Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters.
+# Overview
+
+Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application deployment.
 
 It has the following features:
 
+## Platform
 - Kubernetes
-- Cilium
 - CoreOS (CoreOS-stable-1855.4.0-hvm)
+
+## Authorization, Authentication and Access Control
 - RBAC enabled
-- Helm installed
+- DEX & Static Password login (for kubectl credential)
+
+## Monitoring
 - Includes Prometheus Operator (& Kube-Prometheus collectors)
 - Grafana pre-configured with basic graphs
+
+## Networking
 - Ingress-controller setup
 - External DNS to Route53
+- Cilium
+
+## Autoscaling
 - Cluster Autoscaler enabled
-- DEX & Static Password login (for kubectl credential)
+
+## CI/CD and Deployments
 - Flux for CD pipeline and automated deployments
+- Helm installed
 - AWS Service Operator installed (for auto-creation of ECRs)
 
-# Provisioning a polaris cluster
+# Principles
+
+Polaris is __built, governed__ and __benchmarked__ against the following principles:
+
+- Fully Automated
+- Batteries Included
+- Core Kubernetes
+- Scalable
+- Secure
+- Immutable
+- Platform Agnostic
+- Customizable
+
+For a more detailed look at the Principles and Architecture of Polaris please view [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+# Provisioning a polaris cluster on AWS
 
 1. Generate the DEX Certificate Authority bits
 
@@ -142,7 +170,7 @@ Then add under spec:
   maxSize: 6
 ```
 
-4. Create the cluster.
+5. Create the cluster.
 
 ```
 $ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
@@ -152,7 +180,7 @@ $ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
 $ watch -d 'kubectl get nodes -o wide; kubectl get pods --all-namespaces'
 ```
 
-5. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
+6. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
 
 ```
 kubectl create namespace polaris
@@ -165,7 +193,7 @@ helm upgrade --namespace polaris --install polaris-prometheus-operator charts/pr
 helm upgrade --namespace polaris --install polaris charts/polaris
 ```
 
-6. Setup DEX
+7. Setup DEX
 
 ```
 install the dex certificates:
@@ -182,7 +210,7 @@ install a clusterrole for the admin@example.com administrator:
 kubectl apply --namespace polaris -f k8/serviceaccounts/admin@example.com.yaml
 ```
 
-7. Login and get a kubectl token:
+8. Login and get a kubectl token:
 
 ```
 https://login.example.cluster.k8s
@@ -190,7 +218,7 @@ https://login.example.cluster.k8s
 and load up the kube-config as directed (maybe take a backup of existing!)
 ```
 
-8. Setup Flux for CD
+9. Setup Flux for CD
 
 ```
 Create a code-commit repo in AWS (manually for now...). e.g. kubernetes-example-cluster
@@ -228,7 +256,7 @@ Then to setup example as an automated deployment:
 $ fluxctl --k8s-fwd-ns polaris -n example automate -c example:fluxhelmrelease/example
 ```
 
-9. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
+10. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
 
 ```
 $ kubectl edit deployment daemonset cilium -n kube-system
@@ -241,7 +269,7 @@ to:
 Then kill every cilium pod (and have it restart).
 ```
 
-10. Install aws-service-operator (early beta, but cool for creating ECRs)
+11. Install aws-service-operator (early beta, but cool for creating ECRs)
 
 ```
 # Edit values and make sure you have sane values
