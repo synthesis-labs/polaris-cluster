@@ -60,6 +60,20 @@ For a more detailed look at the Principles and Architecture of Polaris please vi
 
 # Provisioning a polaris cluster on AWS
 
+## What you'll need:
+
+- Registered domain name
+- Route53 Hosted Zone
+- S3 state bucket
+- IAM User with access key for kops with the following permissions:
+  * AmazonEC2FullAccess
+  * IAMFullAccess
+  * AmazonS3FullAccess
+  * AmazonVPCFullAccess
+  * AmazonRoute53
+
+You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/docs/aws.md) for more info.
+
 1. Generate the DEX Certificate Authority bits
 
 ```
