@@ -32,8 +32,39 @@ const list_reducer = (state = [], action) => {
   }
 }
 
+const item_reducer = (state = {}, action) => {
+  console.log(`item_reducer current: ${JSON.stringify(state)} action: ${JSON.stringify(action)}`)
+  if (action.type != "ITEM")
+    return state
+  else {
+    switch (action.action) {
+      case "ACTIVE": {
+        let listitems = state[action.data.list] || []
+        listitems = listitems
+            .filter((i) => { return i.name != action.data.name })
+            .concat(action.data)
+        state[action.data.list] = listitems
+        return state
+        break
+      }
+      case "DELETED": {
+        let listitems = state[action.data.list] || []
+        listitems = listitems
+            .filter((i) => { return i.name != action.data.name })
+        state[action.data.list] = listitems
+        return state
+        break
+      }
+      default:
+        console.log("Some other state not being handled?")
+        return state
+    }
+  }
+}
+
 const root_reducer = combineReducers({
   lists: list_reducer,
+  items: item_reducer,
 })
 
 class App extends Component {
@@ -45,15 +76,7 @@ class App extends Component {
         root_reducer,
         applyMiddleware(thunk),
       ),
-      new_list_name: "",
     };
-    console.log(this.state.store)
-
-    this.new_list = this.new_list.bind(this)
-    this.handle_new_list_name_change = this.handle_new_list_name_change.bind(this)
-    this.refresh = this.refresh.bind(this)
-    this.spam = this.spam.bind(this)
-
     this.connect()
   }
 
@@ -103,12 +126,9 @@ class App extends Component {
     // Notify react to update when the state store updates
     //
     this.state.store.subscribe(() => {
+      console.log("Store subscribe()")
       this.forceUpdate();
     });
-  }
-
-  handle_new_list_name_change(event) {
-    this.setState({new_list_name: event.target.value})
   }
 
   new_list() {
@@ -116,18 +136,11 @@ class App extends Component {
       type: "LIST",
       cmd: "CREATE",
       data: {
-        name: this.state.new_list_name
+        name: this.refs.new_list_name.value
       }
     };
 
     this.ws.send(JSON.stringify(cmd));
-  }
-
-  spam(f) {
-    setTimeout(() => {
-      for (let i = 0; i < 9999; ++i)
-        f()
-    }, 500)
   }
 
   refresh() {
@@ -143,21 +156,23 @@ class App extends Component {
       <Provider store={this.state.store}>
         <div className="App">
           <header className="App-header">
-            <div>
-              {this.state.store.getState().lists.map((list) => <List key={list.name} {...list} ws={this.ws}></List>)}
-            </div>
-            <input type="text"
-              value={this.state.new_list_name}
-              onChange={this.handle_new_list_name_change}
-            />
-            <button onClick={ this.new_list }>Create list</button>
-            <button onClick={ this.refresh }>Refresh</button>
-            <button onClick={ () => this.spam(this.new_list) }>Spam Create list</button>
-            <button onClick={ () => this.spam(this.refresh)  }>Spam Refresh</button>
-            <p>
-              { JSON.stringify(this.state.store.getState())}
-            </p>
+            <h1>Hyper-scale Todo App</h1>
           </header>
+          <div className="App-body">
+            <div>
+              {
+                this.state.store.getState().lists.map((list) =>
+                  <List key={list.name} {...list} ws={this.ws} store={this.state.store}></List>
+                )
+              }
+            </div>
+            New list ==>&nbsp;
+            <input type="text"
+              ref="new_list_name"
+            />
+            &nbsp;<a href="#" className="App-link" onClick={ this.new_list.bind(this) }>[+]</a>
+            &nbsp;<a href="#" className="App-link" onClick={ this.refresh.bind(this) }>[refresh]</a>
+          </div>
         </div>
       </Provider>
     );

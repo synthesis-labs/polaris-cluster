@@ -2,6 +2,8 @@ package ws;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 import protocol.*;
+import protocol.list.ItemCommand;
+import protocol.list.ItemCommandAction;
 import protocol.list.ListCommand;
 import protocol.list.ListCommandAction;
 import stream.Blueprint;
@@ -38,6 +40,7 @@ public class WsEndpoint {
         switch (command.type) {
             case "REFRESH": {
                 Blueprint.queryListTable(session.getId());
+                Blueprint.queryItemTable(session.getId());
                 break;
             }
             case "LIST": {
@@ -74,6 +77,44 @@ public class WsEndpoint {
                 ProducerRecord record = new ProducerRecord("todo-list-commands", listServiceCommand);
                 Blueprint.commandProducer.send(record);
                 System.out.println("Put " + listServiceCommand.getAction() + " on LIST service");
+                break;
+            }
+            case "ITEM": {
+
+                // Get the name of the list
+                //
+                String itemName = command.data.getAsJsonObject().get("name").getAsString();
+                String listName = command.data.getAsJsonObject().get("list").getAsString();
+
+                ItemCommand itemServiceCommand = new ItemCommand();
+                itemServiceCommand.setName(itemName);
+                itemServiceCommand.setList(listName);
+
+                switch (command.cmd) {
+                    case "CREATE":
+                        itemServiceCommand.setAction(ItemCommandAction.CREATE.CREATE);
+                        break;
+                    case "DELETE":
+                        itemServiceCommand.setAction(ItemCommandAction.DELETE);
+                        break;
+                    case "UPDATE":
+                        itemServiceCommand.setAction(ItemCommandAction.UPDATE);
+                        break;
+                    case "MARK_COMPLETED":
+                        itemServiceCommand.setAction(ItemCommandAction.MARK_COMPLETED);
+                        break;
+                    case "MARK_UNCOMPLETED":
+                        itemServiceCommand.setAction(ItemCommandAction.MARK_UNCOMPLETED);
+                        break;
+                    default:
+                        // TODO be better
+                        //
+                        throw new IOException("Invalid cmd field");
+                }
+
+                ProducerRecord record = new ProducerRecord("todo-item-commands", itemServiceCommand);
+                Blueprint.commandProducer.send(record);
+                System.out.println("Put " + itemServiceCommand.getAction() + " on ITEM service");
                 break;
             }
         }

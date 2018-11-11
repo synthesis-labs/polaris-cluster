@@ -15,9 +15,7 @@ import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
-import protocol.list.List;
-import protocol.list.ListCommand;
-import protocol.list.ListStatus;
+import protocol.list.*;
 import ws.WsEndpoint;
 import ws.WsUpdate;
 
@@ -33,6 +31,9 @@ public class Blueprint {
 
     private static String todo_list_commands;
     private static String todo_lists;
+
+    private static String todo_item_commands;
+    private static String todo_items;
 
     public static KafkaStreams streams;
     public static KafkaProducer commandProducer;
@@ -70,6 +71,11 @@ public class Blueprint {
         System.out.println("todo_list_commands: " + todo_list_commands);
         todo_lists = System.getenv("todo_lists");
         System.out.println("todo_lists: " + todo_lists);
+
+        todo_item_commands = System.getenv("todo_item_commands");
+        System.out.println("todo_item_commands: " + todo_item_commands);
+        todo_items = System.getenv("todo_items");
+        System.out.println("todo_items: " + todo_items);
     }
 
     public static void init() {
@@ -95,6 +101,7 @@ public class Blueprint {
         // Build individual streams - Yes these could be hosted in seperate microservices
         //
         startTodoListsService(builder, serdeConfig);
+        startTodoItemsService(builder, serdeConfig);
         startWsUpdatesService(builder, serdeConfig);
 
         //
@@ -146,17 +153,70 @@ public class Blueprint {
             .to(todo_lists, Produced.with(Serdes.serdeFrom(String.class), listSerde));
     }
 
+    public static void startTodoItemsService(StreamsBuilder builder, Map<String, String> serdeConfig) {
+
+        final SpecificAvroSerde<ItemCommand> itemCommandSerde = new SpecificAvroSerde<>();
+        itemCommandSerde.configure(serdeConfig, false);
+
+        final SpecificAvroSerde<Item> itemSerde = new SpecificAvroSerde<>();
+        itemSerde.configure(serdeConfig, false);
+
+        final KStream<String, ItemCommand> itemCommands =
+                builder.stream(todo_item_commands,
+                        Consumed.with(Serdes.serdeFrom(String.class), itemCommandSerde));
+
+        itemCommands
+                .map((String k, ItemCommand v) -> {
+                    Item itemUpdate = new Item();
+                    switch (v.getAction()) {
+                        case CREATE:
+
+                            // Should probably check that the list exists?
+
+                            itemUpdate.setName(v.getName());
+                            itemUpdate.setList(v.getList());
+                            itemUpdate.setStatus(ItemStatus.ACTIVE);
+                            break;
+                        case DELETE:
+                            itemUpdate.setName(v.getName());
+                            itemUpdate.setList(v.getList());
+                            itemUpdate.setStatus(ItemStatus.DELETED);
+                            break;
+                        case UPDATE:
+                            // Nothing to update yet?
+                            break;
+                        case MARK_COMPLETED:
+                            // Nothing to update yet?
+                            break;
+                        case MARK_UNCOMPLETED:
+                            // Nothing to update yet?
+                            break;
+                    }
+                    return KeyValue.pair(k, itemUpdate);
+                })
+                .to(todo_items, Produced.with(Serdes.serdeFrom(String.class), itemSerde));
+    }
+
+
     public static void startWsUpdatesService(StreamsBuilder builder, Map<String, String> serdeConfig) {
 
         Serde<String> stringSerde = Serdes.serdeFrom(String.class);
-        
+
+        // For lists
+        //
         final SpecificAvroSerde<List> listSerde = new SpecificAvroSerde<>();
         listSerde.configure(serdeConfig, false);
-
         final KStream<String, List> lists =
                 builder.stream(todo_lists, Consumed.with(stringSerde, listSerde));
 
-        // Emit updates to Websocket (this should be in the todo-ws service)
+        // For items
+        //
+        final SpecificAvroSerde<Item> itemSerde = new SpecificAvroSerde<>();
+        itemSerde.configure(serdeConfig, false);
+        final KStream<String, Item> items =
+                builder.stream(todo_items, Consumed.with(stringSerde, itemSerde));
+
+        // Lists - Emit updates to Websocket (this should be in the todo-ws service)
         //
         lists.foreach((String k, List list) -> {
             Gson gson = new Gson();
@@ -172,6 +232,24 @@ public class Blueprint {
             WsEndpoint.broadcast(json);
         });
 
+        // Items - Emit updates to Websocket (this should be in the todo-ws service)
+        //
+        items.foreach((String k, Item item) -> {
+            Gson gson = new Gson();
+            WsUpdate update = new WsUpdate();
+
+            update.type = "ITEM";
+            update.action = item.getStatus().toString();
+            update.data = gson.toJsonTree(item);
+
+            String json = gson.toJson(update);
+
+            System.out.println("Emitting WS update");
+            WsEndpoint.broadcast(json);
+        });
+
+        // Lists - ktable
+        //
         final KTable<String, List> listTable =
             lists
                 .map((String k, List list) -> {
@@ -180,11 +258,21 @@ public class Blueprint {
                 })
                 .groupByKey(Serialized.with(stringSerde, listSerde))
                 .reduce((v1, v2) -> v2, Materialized.as("listTableKeyStore"));
+
+        // Items - ktable
+        //
+        final KTable<String, Item> itemTable =
+                items
+                        .map((String k, Item item) -> {
+                            System.out.println("KTabling " + item.getName() + " " + item.getStatus().toString());
+                            return KeyValue.pair(item.getList() + "-" + item.getName(), item);
+                        })
+                        .groupByKey(Serialized.with(stringSerde, itemSerde))
+                        .reduce((v1, v2) -> v2, Materialized.as("itemTableKeyStore"));
     }
 
     public static void queryListTable(String forWebsocket) {
         ReadOnlyKeyValueStore<String, List> store = streams.store("listTableKeyStore", QueryableStoreTypes.keyValueStore());
-        System.out.println("Approximately " + store.approximateNumEntries() + " total lists");
 
         KeyValueIterator<String, List> values = store.all();
 
@@ -214,4 +302,38 @@ public class Blueprint {
         System.out.println("Emitting WS update");
         WsEndpoint.send(json, forWebsocket);
     }
+
+    public static void queryItemTable(String forWebsocket) {
+        ReadOnlyKeyValueStore<String, Item> store = streams.store("itemTableKeyStore", QueryableStoreTypes.keyValueStore());
+        System.out.println("Approximately " + store.approximateNumEntries() + " total items");
+
+        KeyValueIterator<String, Item> values = store.all();
+
+        Gson gson = new Gson();
+        java.util.List<WsUpdate> updates = new java.util.LinkedList<WsUpdate>();
+
+        while (values.hasNext()) {
+            KeyValue<String, Item> kv = values.next();
+
+            // Don't send update of deletes entries
+            //
+            if (kv.value.getStatus() != ItemStatus.ACTIVE)
+                continue;
+
+            WsUpdate update = new WsUpdate();
+
+            update.type = "ITEM";
+            update.action = kv.value.getStatus().toString();
+            update.data = gson.toJsonTree(kv.value);
+
+            updates.add(update);
+        }
+
+        System.out.println("Approximately " + store.approximateNumEntries() + " total items, and " + updates.size() + " in update");
+
+        String json = gson.toJson(updates);
+        System.out.println("Emitting WS update");
+        WsEndpoint.send(json, forWebsocket);
+    }
+
 }
