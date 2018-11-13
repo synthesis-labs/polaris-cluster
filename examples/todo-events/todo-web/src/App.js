@@ -144,11 +144,14 @@ class App extends Component {
   }
 
   refresh() {
-    const cmd = {
-      type: "REFRESH"
-    }
-
-    this.ws.send(JSON.stringify(cmd));
+    this.ws.send(JSON.stringify({
+      type: "LIST",
+      cmd: "REFRESH"
+    }));
+    this.ws.send(JSON.stringify({
+      type: "ITEM",
+      cmd: "REFRESH"
+    }));
   }
 
   render() {

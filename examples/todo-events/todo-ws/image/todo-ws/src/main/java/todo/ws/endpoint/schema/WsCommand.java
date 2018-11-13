@@ -1,9 +1,9 @@
-package ws;
+package todo.ws.endpoint.schema;
 
 import com.google.gson.JsonElement;
 
-public class WsUpdate {
+public class WsCommand {
     public String type;
-    public String action;
+    public String cmd;
     public JsonElement data;
 }

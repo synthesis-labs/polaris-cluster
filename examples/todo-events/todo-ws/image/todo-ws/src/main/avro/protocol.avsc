@@ -1,12 +1,50 @@
 [
   {
-    "namespace" : "protocol.list",
+    "namespace": "protocol.todo",
+    "name": "TodoCommand",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "type",
+        "type" : "string"
+      },
+      {
+        "name" : "cmd",
+        "type" : "string"
+      },
+      {
+        "name" : "data",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace": "protocol.todo",
+    "name": "TodoUpdate",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "type",
+        "type" : "string"
+      },
+      {
+        "name" : "action",
+        "type" : "string"
+      },
+      {
+        "name" : "data",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace" : "protocol.todo",
     "name" : "ListCommandAction",
     "type": "enum",
     "symbols" : ["CREATE", "DELETE", "UPDATE", "MARK_COMPLETED", "MARK_UNCOMPLETED"]
   },
   {
-    "namespace": "protocol.list",
+    "namespace": "protocol.todo",
     "name": "ListCommand",
     "type": "record",
     "fields" : [
@@ -21,13 +59,13 @@
     ]
   },
   {
-    "namespace" : "protocol.list",
+    "namespace" : "protocol.todo",
     "name" : "ListStatus",
     "type" : "enum",
     "symbols" : ["ACTIVE", "DELETED"]
   },
   {
-    "namespace": "protocol.list",
+    "namespace": "protocol.todo",
     "name": "List",
     "type": "record",
     "fields" : [
@@ -42,13 +80,13 @@
     ]
   },
   {
-    "namespace" : "protocol.list",
+    "namespace" : "protocol.todo",
     "name" : "ItemCommandAction",
     "type": "enum",
     "symbols" : ["CREATE", "DELETE", "UPDATE", "MARK_COMPLETED", "MARK_UNCOMPLETED"]
   },
   {
-    "namespace": "protocol.list",
+    "namespace": "protocol.todo",
     "name": "ItemCommand",
     "type": "record",
     "fields" : [
@@ -67,13 +105,13 @@
     ]
   },
   {
-    "namespace" : "protocol.list",
+    "namespace" : "protocol.todo",
     "name" : "ItemStatus",
     "type" : "enum",
     "symbols" : ["ACTIVE", "DELETED"]
   },
   {
-    "namespace": "protocol.list",
+    "namespace": "protocol.todo",
     "name": "Item",
     "type": "record",
     "fields" : [

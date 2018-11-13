@@ -1,4 +1,4 @@
-package ws;
+package todo.ws.endpoint.schema;
 
 import com.google.gson.Gson;
 
