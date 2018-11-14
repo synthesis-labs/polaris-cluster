@@ -4,7 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.TopicPartitionReplica;
+import org.apache.kafka.common.acl.AclBinding;
+import org.apache.kafka.common.acl.AclBindingFilter;
+import org.apache.kafka.common.config.ConfigResource;
+import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -22,9 +29,9 @@ import protocol.todo.TodoUpdate;
 import todo.ws.endpoint.WsEndpoint;
 import todo.ws.endpoint.schema.WsUpdate;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class TodoWsService {
 
@@ -59,7 +66,7 @@ public class TodoWsService {
         return server;
     }
 
-    public static void startKafkaStreams() {
+    public static void configureKafka() {
         String kafka_application_id = "todo-ws-service";
 
         // All environmental configuration passed in from environment variables
@@ -92,7 +99,9 @@ public class TodoWsService {
         System.out.println("todo_commands_topic: " + todo_commands_topic);
         todo_updates_topic = System.getenv("todo_updates_topic");
         System.out.println("todo_updates_topic: " + todo_updates_topic);
+    }
 
+    public static void startKafkaStreams() {
         // Avro serde configs
         //
         final Map<String, String> serdeConfig =
@@ -151,6 +160,31 @@ public class TodoWsService {
     public static void main(String[] args) throws Exception {
 
         Server wsServer = startWsServer();
+
+        // Configure Kafka
+        //
+        configureKafka();
+
+        // Create the required topics
+        //
+        System.out.println("Creating topics that might not exist");
+        AdminClient admin = AdminClient.create(defaultProperties);
+        CreateTopicsResult result = admin.createTopics(Arrays.asList(
+            new NewTopic(todo_commands_topic, 12, (short)1),
+            new NewTopic(todo_updates_topic, 12, (short)1)
+        ));
+        try {
+            result.all().get(60, TimeUnit.SECONDS);
+        }
+        catch (ExecutionException e) {
+            if (e.getCause() instanceof TopicExistsException) {
+                System.out.println(e.getMessage());
+            }
+            else {
+                throw e;
+            }
+        }
+
 
         startKafkaStreams();
 

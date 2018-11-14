@@ -6,7 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -25,10 +29,9 @@ import protocol.todo.TodoUpdate;
 import todo.ws.endpoint.schema.WsUpdate;
 
 import java.security.KeyPair;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class TodoListService {
 
@@ -38,12 +41,12 @@ public class TodoListService {
 
     public static String todo_commands_topic;
     public static String todo_list_updates_topic;
-    public static String todo_lists_table;
     public static String todo_updates_topic;
+    public static String todo_lists_table;
 
     public static KafkaStreams streams;
 
-    public static void startKafkaStreams() {
+    public static void configureKafka() {
         String kafka_application_id = "todo-list-service";
 
         // All environmental configuration passed in from environment variables
@@ -80,7 +83,9 @@ public class TodoListService {
         System.out.println("todo_lists_table: " + todo_lists_table);
         todo_updates_topic = System.getenv("todo_updates_topic");
         System.out.println("todo_updates_topic: " + todo_updates_topic);
+    }
 
+    public static void startKafkaStreams() {
         // Avro serde configs
         //
         final Map<String, String> serdeConfig =
@@ -257,6 +262,32 @@ public class TodoListService {
     }
 
     public static void main(String[] args) throws Exception {
+        // Configure Kafka
+        //
+        configureKafka();
+
+        // Create the required topics
+        //
+        System.out.println("Creating topics that might not exist");
+        AdminClient admin = AdminClient.create(defaultProperties);
+        CreateTopicsResult result = admin.createTopics(Arrays.asList(
+                new NewTopic(todo_commands_topic, 12, (short)1),
+                new NewTopic(todo_updates_topic, 12, (short)1),
+                new NewTopic(todo_list_updates_topic, 12, (short)1)
+        ));
+
+        try {
+            result.all().get(60, TimeUnit.SECONDS);
+        }
+        catch (ExecutionException e) {
+            if (e.getCause() instanceof TopicExistsException) {
+                System.out.println(e.getMessage());
+            }
+            else {
+                throw e;
+            }
+        }
+
         startKafkaStreams();
     }
 
