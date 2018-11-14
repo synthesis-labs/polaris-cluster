@@ -252,12 +252,11 @@ $ helm install --name=aws-service-operator k8/charts/aws-service-operator
 # manually applying it - then login to AWS and list
 ```
 
-## Other adminitrative stuff
+## Other administrative stuff
 
 - Shell access to the cluster (using creators id_rsa):
 ```
 ssh -i ~/.ssh/id_rsa admin@api.example.cluster.k8s
 ```
 
-Theres it!
-
+There's it!
