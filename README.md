@@ -12,25 +12,67 @@ ______   ____ |  | _____ _______|__| ______
 
 ```
 
-Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters.
+# Overview
+
+Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application deployment.
 
 It has the following features:
 
+## Platform
 - Kubernetes
-- Cilium
 - CoreOS (CoreOS-stable-1855.4.0-hvm)
+
+## Authorization, Authentication and Access Control
 - RBAC enabled
-- Helm installed
+- DEX & Static Password login (for kubectl credential)
+
+## Monitoring
 - Includes Prometheus Operator (& Kube-Prometheus collectors)
 - Grafana pre-configured with basic graphs
+
+## Networking
 - Ingress-controller setup
 - External DNS to Route53
+- Cilium
+
+## Autoscaling
 - Cluster Autoscaler enabled
-- DEX & Static Password login (for kubectl credential)
+
+## CI/CD and Deployments
 - Flux for CD pipeline and automated deployments
+- Helm installed
 - AWS Service Operator installed (for auto-creation of ECRs)
 
-# Provisioning a polaris cluster
+# Principles
+
+Polaris is __built, governed__ and __benchmarked__ against the following principles:
+
+- Fully Automated
+- Batteries Included
+- Core Kubernetes
+- Scalable
+- Secure
+- Immutable
+- Platform Agnostic
+- Customizable
+
+For a more detailed look at the Principles and Architecture of Polaris please view [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+# Provisioning a polaris cluster on AWS
+
+## What you'll need:
+
+- Registered domain name
+- Route53 Hosted Zone
+- S3 state bucket
+- IAM User with access key for kops with the following permissions:
+  * AmazonEC2FullAccess
+  * IAMFullAccess
+  * AmazonS3FullAccess
+  * AmazonVPCFullAccess
+  * AmazonRoute53
+
+You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/docs/aws.md) for more info.
 
 1. Generate the DEX Certificate Authority bits
 
@@ -57,7 +99,7 @@ Then add under spec:
     content: |
       *<< CONTENTS OF k8/dex/ca/dex-ca-cert.pem >>*
   kubeAPIServer:
-    oidcIssuerURL: https://dex.example.cluster.k8s
+    oidcIssuerURL: *<< URL FOR DEX HERE (eg. https://dex.example.cluster.k8s) >>*
     oidcClientID: kubectl-access
     oidcUsernameClaim: email
     oidcGroupsClaim: groups
@@ -142,60 +184,69 @@ Then add under spec:
   maxSize: 6
 ```
 
-4. Create the cluster.
+5. Create the cluster.
 
 ```
+Test run:
 $ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
 
-... wait for cluster to come up ...
+Apply changes:
+$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s --yes
 
+... wait for cluster to come up ...
 $ watch -d 'kubectl get nodes -o wide; kubectl get pods --all-namespaces'
 ```
 
-5. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
+6. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
 
 ```
-kubectl create namespace polaris
+$ kubectl create namespace polaris
 
-kubectl apply -f k8/serviceaccounts/tiller-serviceaccount.yaml
-helm init --service-account helm-tiller --upgrade --debug --wait
+$ kubectl apply -f k8/serviceaccounts/tiller-serviceaccount.yaml
 
-helm upgrade --namespace polaris --install polaris-prometheus-operator charts/prometheus-operator-0.0.29.tgz
+$ helm init --service-account helm-tiller --upgrade --debug --wait
 
-helm upgrade --namespace polaris --install polaris charts/polaris
+$ helm upgrade --namespace polaris --install polaris-prometheus-operator charts/prometheus-operator-0.0.29.tgz
+
+$ helm upgrade --namespace polaris --install polaris charts/polaris
 ```
 
-6. Setup DEX
+7. Setup DEX
 
 ```
-install the dex certificates:
-kubectl create configmap dex-ca --namespace polaris --from-file dex-ca.pem=dex/ca/dex-ca-cert.pem;
-kubectl create secret tls dex-ca --namespace polaris --cert=k8/dex/ca/dex-ca-cert.pem --key=dex/ca/dex-ca-key.pem;
-kubectl create secret tls dex-tls --namespace polaris --cert=k8/dex/ca/dex-issuer-cert.pem --key=dex/ca/dex-issuer-key.pem;
-hit dex on /.well-known/openid-configuration and ensure you get the dex-kube-issuer cert
+Install the dex certificates:
 
-modify charts/dex-k8s-authenticator/values.yaml and ensure:
-1. CA certificate link is set to public in s3
+$ kubectl create configmap dex-ca --namespace polaris --from-file dex-ca.pem=k8/dex/ca/dex-ca-cert.pem
+
+$ kubectl create secret tls dex-ca --namespace polaris --cert=k8/dex/ca/dex-ca-cert.pem --key=dex/ca/dex-ca-key.pem
+
+$ kubectl create secret tls dex-tls --namespace polaris --cert=k8/dex/ca/dex-issuer-cert.pem --key=dex/ca/dex-issuer-key.pem
+
+Hit dex on https://dex.example.cluster.k8s/.well-known/openid-configuration and ensure you get the dex-kube-issuer cert.
+
+Modify charts/dex-k8s-authenticator/values.yaml and ensure:
+1. CA certificate link is set to public in S3
 2. CA certificate contents exists in cacerts section (as base64 encoded value)
 
-install a clusterrole for the admin@example.com administrator:
-kubectl apply --namespace polaris -f k8/serviceaccounts/admin@example.com.yaml
+Install a clusterrole for the admin@example.com administrator:
+
+$ kubectl apply --namespace polaris -f k8/serviceaccounts/admin@example.com.yaml
 ```
 
-7. Login and get a kubectl token:
+8. Login and get a kubectl token:
 
 ```
 https://login.example.cluster.k8s
 
-and load up the kube-config as directed (maybe take a backup of existing!)
+Load up the kube-config as directed (maybe take a backup of existing!)
 ```
 
-8. Setup Flux for CD
+9. Setup Flux for CD
 
 ```
-Create a code-commit repo in AWS (manually for now...). e.g. kubernetes-example-cluster
+Create a code-commit repo in AWS (manually for now...) - e.g. kubernetes-example-cluster.
 
-Create an IAM user in AWS (manually for now...) - e.g. flux-example-user
+Create an IAM user in AWS (manually for now...) - e.g. flux-example-user.
 
 Create an HTTPS Git credentials for AWS CodeCommit for that IAM user, and note the
 username and password.
@@ -203,32 +254,33 @@ username and password.
 Edit charts/flux/values.yaml and ensure you setup the following:
 git.url to have the correct username and password, VERY IMPORTANT that the password is URLEncoded! Otherwise you will get weird errors from flux.
 
-kubectl create namespace devops
-helm upgrade --namespace devops --install flux k8/charts/flux
+$ kubectl create namespace devops
 
-and then watch flux log itself connecting and syncing the repository.
+$ helm upgrade --namespace devops --install flux k8/charts/flux
+
+Watch flux log itself connecting and syncing the repository.
 
 You should now be able to:
 
 $ fluxctl --k8s-fwd-ns polaris list-controllers
+
 $ fluxctl --k8s-fwd-ns polaris list-images
 
-Any specs you put in /cluster-repo will be applied to the cluster.
+Any specs you put in /cluster-repo and push will be applied to the cluster.
 
 Charts must be in /cluster-repo/charts and a corresponding release/blah.yaml containing
 a FluxHelmRelease for it would also be applied.
 
 Cool watch to see stuff happening:
-watch -d '
-  fluxctl --k8s-fwd-ns polaris -n example list-controllers;
-  fluxctl --k8s-fwd-ns polaris -n example list-images -c example:deployment/example-example
-'
+
+$ watch -d 'fluxctl --k8s-fwd-ns polaris -n example list-controllers; fluxctl --k8s-fwd-ns polaris -n example list-images -c example:deployment/example-example'
 
 Then to setup example as an automated deployment:
+
 $ fluxctl --k8s-fwd-ns polaris -n example automate -c example:fluxhelmrelease/example
 ```
 
-9. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
+10. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
 
 ```
 $ kubectl edit deployment daemonset cilium -n kube-system
@@ -238,25 +290,24 @@ Change from:
 to:
   image: cilium/cilium:v1.2
 
-Then kill every cilium pod (and have it restart).
+Then delete every cilium pod (and have it restart).
 ```
 
-10. Install aws-service-operator (early beta, but cool for creating ECRs)
+11. Install aws-service-operator (early beta, but cool for creating ECRs)
 
 ```
-# Edit values and make sure you have sane values
+Edit values and make sure you have sane values:
 
 $ helm install --name=aws-service-operator k8/charts/aws-service-operator
 
-# Test that it's working, but pushing an ECRRepository into the flux pipe or
-# manually applying it - then login to AWS and list
+Test that it's working by pushing an ECRRepository into the flux pipe or manually applying it - then login to AWS and list.
 ```
 
 ## Other administrative stuff
 
 - Shell access to the cluster (using creators id_rsa):
 ```
-ssh -i ~/.ssh/id_rsa admin@api.example.cluster.k8s
+$ ssh -i ~/.ssh/id_rsa admin@api.example.cluster.k8s
 ```
 
 There's it!
