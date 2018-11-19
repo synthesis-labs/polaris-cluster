@@ -5,7 +5,7 @@
 replicaCount: 1
 
 kafka_connect_ui:
-  connect_url: cp-kafka-cp-kafka-connect:8083
+  connect_url: polaris-kafka-cp-kafka-connect:8083
 
 image:
   repository: landoop/kafka-connect-ui

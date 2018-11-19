@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@ServerEndpoint(value = "/updates",
+@ServerEndpoint(value = "/ws/updates",
         decoders = WsCommandDecoder.class,
         encoders = WsCommandEncoder.class)
 public class WsEndpoint {

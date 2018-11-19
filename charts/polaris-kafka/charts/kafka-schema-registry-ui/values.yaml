@@ -5,7 +5,7 @@
 replicaCount: 1
 
 kafka_schema_registry_ui:
-  schema_registry_url: cp-kafka-cp-schema-registry:8081
+  schema_registry_url: polaris-kafka-cp-schema-registry:8081
 
 image:
   repository: landoop/schema-registry-ui

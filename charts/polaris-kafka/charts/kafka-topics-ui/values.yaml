@@ -5,7 +5,7 @@
 replicaCount: 1
 
 kafka_topics_ui:
-  kafka_rest_proxy_url: cp-kafka-cp-kafka-rest:8082
+  kafka_rest_proxy_url: polaris-kafka-cp-kafka-rest:8082
 
 image:
   repository: landoop/kafka-topics-ui

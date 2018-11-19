@@ -1,0 +1,79 @@
+cp-helm-charts:
+  cp-zookeeper:
+    enabled: true
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1536Mi
+      requests:
+        cpu: 1000m
+        memory: 1256Mi
+  cp-kafka:
+    enabled: true
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1536Mi
+      requests:
+        cpu: 1000m
+        memory: 1256Mi
+  cp-schema-registry:
+    enabled: true
+    resources:
+      limits:
+        cpu: 450m
+        memory: 384Mi
+      requests:
+        cpu: 150m
+        memory: 128Mi
+  cp-kafka-rest:
+    enabled: true
+    resources:
+      limits:
+        cpu: 450m
+        memory: 384Mi
+      requests:
+        cpu: 150m
+        memory: 128Mi
+  cp-kafka-connect:
+    enabled: false
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2536Mi
+      requests:
+        cpu: 1000m
+        memory: 1256Mi
+  cp-ksql-server:
+    enabled: true
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1536Mi
+      requests:
+        cpu: 1000m
+        memory: 1256Mi
+kafka-connect-ui:
+  resources:
+    limits:
+      cpu: 450m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 128Mi
+kafka-schema-registry-ui:
+  resources:
+    limits:
+      cpu: 450m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 128Mi
+kafka-topics-ui:
+  resources:
+    limits:
+      cpu: 450m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 128Mi

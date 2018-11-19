@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "todo.fullname" . }}-web
+  name: {{ template "todo.fullname" . }}-ws
   labels:
     app: {{ template "todo.name" . }}
     chart: {{ template "todo.chart" . }}
@@ -12,7 +12,7 @@ spec:
   sessionAffinity: None
   ports:
   - port: 80
-    targetPort: 3000
+    targetPort: 8080
   selector:
-    app: {{ template "todo.name" . }}-web
+    app: {{ template "todo.name" . }}-ws-service
     release: {{ .Release.Name | quote }}

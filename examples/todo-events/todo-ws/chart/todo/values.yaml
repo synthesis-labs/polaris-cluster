@@ -4,8 +4,8 @@ replicaCount: 1
 global_properties:
   # Kafka services
   #
-  kafka_bootstrap_servers: cp-kafka:9092
-  schema_registry_url: http://cp-kafka-cp-schema-registry:8081
+  kafka_bootstrap_servers: polaris-kafka-cp-kafka:9092
+  schema_registry_url: http://polaris-kafka-cp-schema-registry:8081
 
   # Topic and table names to use
   #
@@ -55,11 +55,11 @@ services:
 
 resources:
   requests:
-    cpu: 200m
-    memory: "200Mi"
-  limits:
     cpu: 500m
-    memory: "500Mi"
+    memory: "768Mi"
+  limits:
+    cpu: 1000m
+    memory: "1024Mi"
 
 nodeSelector: {}
 
