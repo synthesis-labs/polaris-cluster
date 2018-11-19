@@ -1,0 +1,68 @@
+
+replicaCount: 1
+
+global_properties:
+  # Kafka services
+  #
+  kafka_bootstrap_servers: polaris-kafka-cp-kafka:9092
+  schema_registry_url: http://polaris-kafka-cp-schema-registry:8081
+
+  # Topic and table names to use
+  #
+  todo_commands_topic: todo-commands
+  todo_updates_topic: todo-updates
+
+web:
+  replicas: 1
+  host: todo.ref4.onlabs.cloud
+  image:
+    repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-web
+    tag: 1.0.0
+    pullPolicy: Always
+
+services:
+  ws-service:
+    replicas: 1
+    command: ["bin/TodoWsService"]
+    image:
+      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+      tag: 1.0.0
+      pullPolicy: Always
+    env:
+      {}
+
+  item-service:
+    replicas: 1
+    command: ["bin/TodoItemService"]
+    image:
+      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+      tag: 1.0.0
+      pullPolicy: Always
+    env:
+      todo_items_table: todo-items
+      todo_item_updates_topic: todo-item-updates
+
+  list-service:
+    replicas: 1
+    command: ["bin/TodoListService"]
+    image:
+      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+      tag: 1.0.0
+      pullPolicy: Always
+    env:
+      todo_lists_table: todo-lists
+      todo_list_updates_topic: todo-list-updates
+
+resources:
+  requests:
+    cpu: 500m
+    memory: "768Mi"
+  limits:
+    cpu: 1000m
+    memory: "1024Mi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

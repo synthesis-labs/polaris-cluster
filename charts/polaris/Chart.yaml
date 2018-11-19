@@ -1,7 +1,7 @@
 apiVersion: v1
 name: Polaris
 appVersion: "1.0"
-description: Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters.
+description: Polaris is an open-source, opinionated & validated architecture for hyper-scale AI first enterprise clusters.
 sources:
   - https://github.com/synthesis-labs/polaris
 version: 1.0.0

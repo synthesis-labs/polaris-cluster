@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "todo.fullname" . }}-ingress
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    # Good for keeping websockets connected for longer
+    #
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+   rules:
+    - host: {{ .Values.web.host }}
+      http:
+         paths:
+          - path: /
+            backend:
+               serviceName: {{ template "todo.fullname" . }}-web
+               servicePort: 80
+          - path: /ws
+            backend:
+               serviceName: {{ template "todo.fullname" . }}-ws
+               servicePort: 80
+   tls:
+    - hosts:
+      - {{ .Values.web.host }}

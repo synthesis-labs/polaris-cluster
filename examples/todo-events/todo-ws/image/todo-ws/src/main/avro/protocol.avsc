@@ -1,0 +1,132 @@
+[
+  {
+    "namespace": "protocol.todo",
+    "name": "TodoCommand",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "type",
+        "type" : "string"
+      },
+      {
+        "name" : "cmd",
+        "type" : "string"
+      },
+      {
+        "name" : "data",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace": "protocol.todo",
+    "name": "TodoUpdate",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "type",
+        "type" : "string"
+      },
+      {
+        "name" : "action",
+        "type" : "string"
+      },
+      {
+        "name" : "data",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace" : "protocol.todo",
+    "name" : "ListCommandAction",
+    "type": "enum",
+    "symbols" : ["CREATE", "DELETE", "UPDATE", "MARK_COMPLETED", "MARK_UNCOMPLETED"]
+  },
+  {
+    "namespace": "protocol.todo",
+    "name": "ListCommand",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "action",
+        "type" : "ListCommandAction"
+      },
+      {
+        "name" : "name",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace" : "protocol.todo",
+    "name" : "ListStatus",
+    "type" : "enum",
+    "symbols" : ["ACTIVE", "DELETED"]
+  },
+  {
+    "namespace": "protocol.todo",
+    "name": "List",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "name",
+        "type" : "string"
+      },
+      {
+        "name" : "status",
+        "type" : "ListStatus"
+      }
+    ]
+  },
+  {
+    "namespace" : "protocol.todo",
+    "name" : "ItemCommandAction",
+    "type": "enum",
+    "symbols" : ["CREATE", "DELETE", "UPDATE", "MARK_COMPLETED", "MARK_UNCOMPLETED"]
+  },
+  {
+    "namespace": "protocol.todo",
+    "name": "ItemCommand",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "action",
+        "type" : "ItemCommandAction"
+      },
+      {
+        "name" : "name",
+        "type" : "string"
+      },
+      {
+        "name" : "list",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace" : "protocol.todo",
+    "name" : "ItemStatus",
+    "type" : "enum",
+    "symbols" : ["ACTIVE", "DELETED"]
+  },
+  {
+    "namespace": "protocol.todo",
+    "name": "Item",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "name",
+        "type" : "string"
+      },
+      {
+        "name" : "list",
+        "type" : "string"
+      },
+      {
+        "name" : "status",
+        "type" : "ItemStatus"
+      }
+    ]
+  }
+]

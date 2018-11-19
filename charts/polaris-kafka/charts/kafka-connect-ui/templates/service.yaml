@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kafka-connect-ui.fullname" . }}
+  labels:
+    app: {{ template "kafka-connect-ui.name" . }}
+    chart: {{ template "kafka-connect-ui.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "kafka-connect-ui.name" . }}
+    release: {{ .Release.Name }}

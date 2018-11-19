@@ -34,6 +34,8 @@ nginx-ingress:
       enabled: true
     extraArgs:
       enable-ssl-passthrough: true
+      proxy-read-timeout: "3600"
+      proxy-send-timeout: "3600"
 
 flux:
   helmOperator:
@@ -42,7 +44,7 @@ flux:
       chartsPath: "example/cluster-repo/charts"
   git:
     url: "" # url for git repo
-    branch: "master" 
+    branch: "master"
     path: "example/cluster-repo/" # directories to watch
     user: "Flux on Example"
     email: "flux@example.com"
