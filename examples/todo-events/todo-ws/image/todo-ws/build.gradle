@@ -54,6 +54,28 @@ dependencies {
     compile('com.google.code.gson:gson:2.8.0')
 }
 
-// Application main class name
+// This is a dummy - start scripts are detailed below
 //
-mainClassName = "TodoWs"
+mainClassName = "dummy"
+
+task TodoWsServiceStartScript(type:CreateStartScripts) {
+    applicationName = 'TodoWsService'
+    mainClassName = 'todo.ws.service.TodoWsService'
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+}
+task TodoListServiceStartScript(type:CreateStartScripts) {
+    applicationName = 'TodoListService'
+    mainClassName = 'todo.list.service.TodoListService'
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+}
+task TodoItemServiceStartScript(type:CreateStartScripts) {
+    applicationName = 'TodoItemService'
+    mainClassName = 'todo.item.service.TodoItemService'
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+}
+applicationDistribution.from(TodoWsServiceStartScript) { into 'bin' }
+applicationDistribution.from(TodoListServiceStartScript) { into 'bin' }
+applicationDistribution.from(TodoItemServiceStartScript) { into 'bin' }

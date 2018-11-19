@@ -9,5 +9,3 @@ WORKDIR app
 COPY --from=build /home/gradle/project/build/install/todo-ws .
 
 VOLUME /tmp
-
-ENTRYPOINT bin/todo-ws

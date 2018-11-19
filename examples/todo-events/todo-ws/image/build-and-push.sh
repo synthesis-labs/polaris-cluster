@@ -1,5 +1,5 @@
 VERSION=1.0.0
-ECR_ROOT=166813201744.dkr.ecr.eu-west-1.amazonaws.com
+ECR_ROOT=535282574996.dkr.ecr.eu-west-1.amazonaws.com
 
 for image in */
 do

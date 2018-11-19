@@ -81,7 +81,7 @@ class App extends Component {
   }
 
   connect() {
-    this.ws = new WebSocket('ws://localhost:8080/updates');
+    this.ws = new WebSocket('ws://todo-ws.ref4.onlabs.cloud/updates');
     this.ws.onmessage = evt => {
       // When we receive an update from the ws, we want to dispatch this
       // to the state store
