@@ -1,6 +1,4 @@
 
-replicaCount: 1
-
 global_properties:
   # Kafka services
   #
