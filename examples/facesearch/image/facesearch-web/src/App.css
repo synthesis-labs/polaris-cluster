@@ -1,0 +1,30 @@
+body {
+  background-color: #282c34;
+}
+
+.App {
+  text-align: left;
+  font-family: monospace;
+}
+
+.App-header {
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-body {
+  color: white;
+}
+
+input {
+  display: inline;
+}
+
+.App-link {
+  color: white;
+}

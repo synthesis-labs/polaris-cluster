@@ -1,0 +1,40 @@
+[
+  {
+    "namespace": "polaris.kafka.websocket",
+    "name": "Command",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "type",
+        "type" : "string"
+      },
+      {
+        "name" : "cmd",
+        "type" : "string"
+      },
+      {
+        "name" : "data",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace": "polaris.kafka.websocket",
+    "name": "Update",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "type",
+        "type" : "string"
+      },
+      {
+        "name" : "action",
+        "type" : "string"
+      },
+      {
+        "name" : "data",
+        "type" : "string"
+      }
+    ]
+  }
+]

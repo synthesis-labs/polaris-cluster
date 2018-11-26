@@ -1,0 +1,52 @@
+{{- range $service_name, $service_detail := $.Values.services }}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "todo.fullname" $ }}-{{ $service_name }}
+  labels:
+    app: {{ template "todo.name" $ }}-{{ $service_name }}
+    chart: {{ template "todo.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  replicas: {{ $service_detail.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "todo.name" $ }}-{{ $service_name }}
+      release: {{ $.Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "todo.name" $ }}-{{ $service_name }}
+        release: {{ $.Release.Name }}
+    spec:
+      containers:
+        - name: {{ $service_name }}
+          image: "{{ $service_detail.image.repository }}:{{ $service_detail.image.tag }}"
+          imagePullPolicy: {{ $service_detail.image.pullPolicy }}
+          command: {{ $service_detail.command }}
+          env:
+            {{- range $key, $val := $.Values.global_properties }}
+            - name: {{ $key }}
+              value: {{ $val }}
+            {{- end }}
+            {{- range $key, $val := $service_detail.env }}
+            - name: {{ $key }}
+              value: {{ $val }}
+            {{- end }}
+          resources:
+{{ toYaml $.Values.resources | indent 12 }}
+    {{- with $.Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $.Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $.Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+---
+{{- end }}
