@@ -14,9 +14,9 @@ ______   ____ |  | _____ _______|__| ______
 
 # Overview
 
-Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application deployment.
+Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design. 
 
-It has the following features:
+Polaris has the following features:
 
 ## Platform
 - Kubernetes
@@ -42,6 +42,12 @@ It has the following features:
 - Flux for CD pipeline and automated deployments
 - Helm installed
 - AWS Service Operator installed (for auto-creation of ECRs)
+
+## Streaming
+- Confluent Platform Open-source (all components from cp-helm-charts)
+- Landoop Schema Registry UI
+- Landoop Topics UI
+- Landoop Connect UI
 
 # Principles
 
