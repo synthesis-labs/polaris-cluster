@@ -1,5 +1,7 @@
 package polaris.kafka
 
+import com.google.gson.Gson
+import facesearch.schema.FaceInferCommand
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import org.apache.avro.specific.SpecificRecord
@@ -17,6 +19,7 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler
 import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Produced
+import polaris.kafka.websocket.Command
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -111,6 +114,23 @@ class PolarisKafka {
     fun <K, V>consumeStream(topic : SafeTopic<K, V>) : KStream<K, V> {
         return streamsBuilder.stream(topic.topic, topic.consumedWith())
     }
+
+    fun <K, V : Command, D>consumeCommandStreamMatching(topic : SafeTopic<K, V>, type : String, cmd : String, classOfData : Class<D>) : KStream<K, D> {
+        return streamsBuilder
+            .stream(topic.topic, topic.consumedWith())
+            .filter { _, command ->
+                command.getType() == type && command.getCmd() == cmd
+            }
+            .mapValues { command ->
+                // Parse the data to correct fields
+                //
+                val gson = Gson()
+                val cmd = gson.fromJson(command.getData(), classOfData)
+
+                cmd
+            }
+    }
+
 
     /*
     fun <K, V>produce(topic : SafeTopic<K, V>) : KStream<K, V> {

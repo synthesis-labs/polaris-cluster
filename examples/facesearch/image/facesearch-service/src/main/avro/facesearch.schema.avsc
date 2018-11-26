@@ -1,0 +1,474 @@
+[
+  {
+    "namespace": "facesearch.schema",
+    "name": "FaceInferCommand",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "image",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace": "facesearch.schema",
+    "name": "FaceInferUpdate",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "id",
+        "type" : "string"
+      }
+    ]
+  },
+  {
+    "namespace": "facesearch.schema",
+    "name": "DetectedLabels",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "orientationCorrection",
+        "type" : ["null", "string"]
+      },
+      {
+        "name" : "labels",
+        "type" : {
+          "type": "array",
+          "items": {
+            "name" : "Label",
+            "type" : "record",
+            "fields" : [
+              {
+                "name" : "name",
+                "type" : "string"
+              },
+              {
+                "name" : "confidence",
+                "type" : "float"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "namespace": "facesearch.schema",
+    "name": "SearchedFacesByImage",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "searchedFaceBoundingBox",
+        "type" : {
+          "name": "BoundingBox",
+          "type": "record",
+          "fields": [
+            {
+              "name": "width",
+              "type": "float"
+            },
+            {
+              "name": "height",
+              "type": "float"
+            },
+            {
+              "name": "left",
+              "type": "float"
+            },
+            {
+              "name": "top",
+              "type": "float"
+            }
+          ]
+        }
+      },
+      {
+        "name" : "searchedFaceConfidence",
+        "type" : "float"
+      },
+      {
+        "name" : "faceMatches",
+        "type" : {
+          "type": "array",
+          "items": {
+            "name" : "FaceMatch",
+            "type" : "record",
+            "fields" : [
+              {
+                "name" : "similarity",
+                "type" : "float"
+              },
+              {
+                "name" : "face",
+                "type" : {
+                  "type": "record",
+                  "name": "Face",
+                  "fields": [
+                    {
+                      "name": "faceId",
+                      "type": "string"
+                    },
+                    {
+                      "name": "boundingBox",
+                      "type": "BoundingBox"
+                    },
+                    {
+                      "name": "imageId",
+                      "type": "string"
+                    },
+                    {
+                      "name": "externalImageId",
+                      "type": "string"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "namespace": "facesearch.schema",
+    "name": "DetectedFaces",
+    "type": "record",
+    "fields" : [
+      {
+        "name" : "orientationCorrection",
+        "type" : ["null", "string"]
+      },
+      {
+        "name": "faceDetails",
+        "type": {
+          "type": "array",
+          "items": {
+            "name": "FaceDetail",
+            "type": "record",
+            "fields": [
+              {
+                "name": "boundingBox",
+                "type": "BoundingBox"
+              },
+              {
+                "name": "ageRange",
+                "type": {
+                  "name": "AgeRange",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "low",
+                      "type": "int"
+                    },
+                    {
+                      "name": "high",
+                      "type": "int"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "smile",
+                "type": {
+                  "name": "Smile",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "eyeglasses",
+                "type": {
+                  "name": "Eyeglasses",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "sunglasses",
+                "type": {
+                  "name": "Sunglasses",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "gender",
+                "type": {
+                  "name": "Gender",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "string"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "beard",
+                "type": {
+                  "name": "Beard",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "mustache",
+                "type": {
+                  "name": "Mustache",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "eyesOpen",
+                "type": {
+                  "name": "EyeOpen",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "mouthOpen",
+                "type": {
+                  "name": "MouthOpen",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "value",
+                      "type": "boolean"
+                    },
+                    {
+                      "name": "confidence",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "emotions",
+                "type": {
+                  "type": "array",
+                  "items": {
+                    "name": "Emotion",
+                    "type": "record",
+                    "fields": [
+                      {
+                        "name": "type",
+                        "type": "string"
+                      },
+                      {
+                        "name": "confidence",
+                        "type": "float"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "landmarks",
+                "type": {
+                  "type": "array",
+                  "items": {
+                    "name": "Landmark",
+                    "type": "record",
+                    "fields": [
+                      {
+                        "name": "type",
+                        "type": "string"
+                      },
+                      {
+                        "name": "x",
+                        "type": "float"
+                      },
+                      {
+                        "name": "y",
+                        "type": "float"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "pose",
+                "type": {
+                  "name": "Pose",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "roll",
+                      "type": "float"
+                    },
+                    {
+                      "name": "yaw",
+                      "type": "float"
+                    },
+                    {
+                      "name": "pitch",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "quality",
+                "type": {
+                  "name": "ImageQuality",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "brightness",
+                      "type": "float"
+                    },
+                    {
+                      "name": "sharpness",
+                      "type": "float"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "confidence",
+                "type": "float"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "namespace": "facesearch.schema",
+    "name": "DetectedText",
+    "type": "record",
+    "fields": [
+      {
+        "name": "textDetections",
+        "type": {
+          "type": "array",
+          "items": {
+            "name": "TextDetection",
+            "type": "record",
+            "fields": [
+              {
+                "name": "detectedText",
+                "type": "string"
+              },
+              {
+                "name": "type",
+                "type": "string"
+              },
+              {
+                "name": "id",
+                "type": "int"
+              },
+              {
+                "name": "parentId",
+                "type": ["null", "int"]
+              },
+              {
+                "name": "confidence",
+                "type": "float"
+              },
+              {
+                "name": "geometry",
+                "type": {
+                  "name": "Geometry",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "boundingBox",
+                      "type": "BoundingBox"
+                    },
+                    {
+                      "name": "polygon",
+                      "type": {
+                        "type": "array",
+                        "items": {
+                          "name": "Point",
+                          "type": "record",
+                          "fields": [
+                            {
+                              "name": "x",
+                              "type": "float"
+                            },
+                            {
+                              "name": "y",
+                              "type": "float"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

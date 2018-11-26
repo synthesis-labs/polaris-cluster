@@ -60,6 +60,11 @@ dependencies {
     compile('javax.websocket:javax.websocket-api:1.1')
     compile('org.eclipse.jetty.websocket:javax-websocket-server-impl:9.2.7.v20150116')
     compile('com.google.code.gson:gson:2.8.0')
+
+    // AWS SDK
+    //
+    compile('com.amazonaws:aws-java-sdk-s3:1.11.375')
+    compile('com.amazonaws:aws-java-sdk-rekognition:1.11.375')
 }
 
 // This is a dummy - start scripts are detailed below

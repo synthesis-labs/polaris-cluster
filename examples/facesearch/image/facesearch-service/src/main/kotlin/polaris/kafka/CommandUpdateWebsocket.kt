@@ -106,6 +106,8 @@ class CommandUpdateEndpointHandler(val commandTopic : SafeTopic<String, Command>
     @OnOpen
     fun opened(session: Session) {
         sessions.add(session)
+        session.maxBinaryMessageBufferSize = 10 * 1024 * 1024
+        session.maxTextMessageBufferSize = 10 * 1024 * 1024
         println("Opened ${session.id}")
     }
 
