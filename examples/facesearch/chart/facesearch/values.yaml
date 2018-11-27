@@ -1,6 +1,4 @@
 
-replicaCount: 1
-
 global_properties:
   # Kafka services
   #
@@ -9,49 +7,26 @@ global_properties:
 
   # Topic and table names to use
   #
-  todo_commands_topic: todo-commands
-  todo_updates_topic: todo-updates
+  dummy: "blah"
 
 web:
   replicas: 1
-  host: todo.ref4.onlabs.cloud
+  host: facesearch.ref4.onlabs.cloud
   image:
-    repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-web
+    repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/facesearch-web
     tag: 1.0.0
     pullPolicy: Always
 
 services:
-  ws-service:
+  websocket-service:
     replicas: 1
-    command: ["bin/TodoWsService"]
+    command: ["bin/FacesearchWsService"]
     image:
-      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/facesearch-service
       tag: 1.0.0
       pullPolicy: Always
     env:
       {}
-
-  item-service:
-    replicas: 100
-    command: ["bin/TodoItemService"]
-    image:
-      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
-      tag: 1.0.0
-      pullPolicy: Always
-    env:
-      todo_items_table: todo-items
-      todo_item_updates_topic: todo-item-updates
-
-  list-service:
-    replicas: 1
-    command: ["bin/TodoListService"]
-    image:
-      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
-      tag: 1.0.0
-      pullPolicy: Always
-    env:
-      todo_lists_table: todo-lists
-      todo_list_updates_topic: todo-list-updates
 
 resources:
   requests:

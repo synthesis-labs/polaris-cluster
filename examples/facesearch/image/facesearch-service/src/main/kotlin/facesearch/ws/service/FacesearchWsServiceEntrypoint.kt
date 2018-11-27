@@ -93,7 +93,7 @@ fun main(args : Array<String>) {
 
                 .mapValues { result ->
                     val gson = Gson()
-                    Update("FACE", "INFERRED", gson.toJson(result))
+                    Update("FACE", "MATCHED_FACE", gson.toJson(result))
                 }
 
                 .to(updates.topic, updates.producedWith())
@@ -158,7 +158,7 @@ fun main(args : Array<String>) {
 
             .mapValues { result ->
                 val gson = Gson()
-                Update("FACE", "INFERRED", gson.toJson(result))
+                Update("FACE", "FOUND_LABEL", gson.toJson(result))
             }
 
             .to(updates.topic, updates.producedWith())
@@ -282,7 +282,7 @@ fun main(args : Array<String>) {
 
                 .mapValues { result ->
                     val gson = Gson()
-                    Update("FACE", "INFERRED", gson.toJson(result))
+                    Update("FACE", "FOUND_FACE", gson.toJson(result))
                 }
 
                 .to(updates.topic, updates.producedWith())
@@ -359,7 +359,7 @@ fun main(args : Array<String>) {
 
                 .mapValues { result ->
                     val gson = Gson()
-                    Update("FACE", "INFERRED", gson.toJson(result))
+                    Update("FACE", "FOUND_TEXT", gson.toJson(result))
                 }
 
                 .to(updates.topic, updates.producedWith())
