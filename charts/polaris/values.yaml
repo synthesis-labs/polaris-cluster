@@ -39,7 +39,7 @@ nginx-ingress:
 
 flux:
   helmOperator:
-    create: truer
+    create: true
     git:
       chartsPath: "example/cluster-repo/charts"
   git:
