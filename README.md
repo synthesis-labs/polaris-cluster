@@ -316,4 +316,9 @@ Test that it's working by pushing an ECRRepository into the flux pipe or manuall
 $ ssh -i ~/.ssh/id_rsa admin@api.example.cluster.k8s
 ```
 
+## Related Polaris Projects
+
+- The Polaris Operator Project https://github.com/synthesis-labs/polaris-operator
+
+
 There's it!
