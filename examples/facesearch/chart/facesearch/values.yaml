@@ -9,6 +9,10 @@ global_properties:
   #
   dummy: "blah"
 
+buildpipeline:
+  sourcerepo: tomtest
+  sourcebranch: facesearch
+
 web:
   replicas: 1
   host: facesearch.ref4.onlabs.cloud

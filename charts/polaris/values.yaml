@@ -8,6 +8,9 @@ aws-service-operator:
     cluster: example       # Can't contain any weird characters!
     region: eu-west-1
 
+polaris-operator:
+  replicas: 1
+
 external-dns:
   image:
     name: registry.opensource.zalan.do/teapot/external-dns
@@ -54,6 +57,12 @@ flux:
     pollInterval: "1m"
 
 dex:
+  serviceAccount:
+    create: true
+  service:
+    annotations: {}
+  rbac:
+    create: true
   secret:
     tlsName: dex-tls
     caName: dex-ca

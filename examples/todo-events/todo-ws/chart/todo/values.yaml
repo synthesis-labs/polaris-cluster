@@ -12,9 +12,17 @@ global_properties:
   todo_commands_topic: todo-commands
   todo_updates_topic: todo-updates
 
+buildpipeline:
+  codecommitrepo: todo
+  branch: master
+
 web:
   replicas: 1
   host: todo.ref4.onlabs.cloud
+  ci:
+    buildspec: examples/todo-events/todo-ws/image/todo-web/buildspec.yaml
+    containerrepository: todo-web
+    tag: 1.0.0
   image:
     repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-web
     tag: 1.0.0
@@ -23,6 +31,10 @@ web:
 services:
   ws-service:
     replicas: 1
+    ci:
+      buildspec: examples/todo-events/todo-ws/image/todo-ws/buildspec.yaml
+      containerrepository: todo-ws
+      tag: 1.0.0
     command: ["bin/TodoWsService"]
     image:
       repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
@@ -33,9 +45,13 @@ services:
 
   item-service:
     replicas: 1
+    ci:
+      buildspec: examples/todo-events/todo-ws/image/todo-ws/buildspec.yaml
+      containerrepository: todo-item
+      tag: 1.0.0
     command: ["bin/TodoItemService"]
     image:
-      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-item
       tag: 1.0.0
       pullPolicy: Always
     env:
@@ -44,9 +60,13 @@ services:
 
   list-service:
     replicas: 1
+    ci:
+      buildspec: examples/todo-events/todo-ws/image/todo-ws/buildspec.yaml
+      containerrepository: todo-list
+      tag: 1.0.0
     command: ["bin/TodoListService"]
     image:
-      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
+      repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-list
       tag: 1.0.0
       pullPolicy: Always
     env:

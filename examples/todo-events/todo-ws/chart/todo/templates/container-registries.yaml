@@ -1,0 +1,26 @@
+apiVersion: polaris.synthesis.co.za/v1alpha1
+kind: PolarisContainerRegistry
+metadata:
+  name: {{ template "todo.fullname" $ }}-web
+  labels:
+    app: {{ template "todo.name" $ }}-web
+    chart: {{ template "todo.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  name: {{ .Values.web.ci.containerrepository }}
+---
+{{- range $service_name, $service_detail := $.Values.services }}
+apiVersion: polaris.synthesis.co.za/v1alpha1
+kind: PolarisContainerRegistry
+metadata:
+  name: {{ template "todo.fullname" $ }}-{{ $service_name }}
+  labels:
+    app: {{ template "todo.name" $ }}-{{ $service_name }}
+    chart: {{ template "todo.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  name: {{ $service_detail.ci.containerrepository }}
+---
+{{- end }}

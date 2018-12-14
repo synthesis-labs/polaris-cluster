@@ -1,0 +1,22 @@
+apiVersion: polaris.synthesis.co.za/v1alpha1
+kind: PolarisBuildPipeline
+metadata:
+  name: {{ template "todo.fullname" . }}-buildpipeline
+  labels:
+    app: {{ template "todo.name" . }}
+    chart: {{ template "todo.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  source:
+    codecommitrepo: {{ .Values.buildpipeline.sourcerepo }}
+    branch: {{ .Values.buildpipeline.sourcebranch }}
+  builds:
+  - name: facesearch-service
+    buildspec: examples/facesearch/image/facesearch-service/buildspec.yaml
+    containerrepository: facesearch-service
+    tag: 1.0.0-facesearch
+  - name: facesearch-web
+    buildspec: examples/facesearch/image/facesearch-web/buildspec.yaml
+    containerrepository: facesearch-web
+    tag: 1.0.0-facesearch

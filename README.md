@@ -155,7 +155,8 @@ Then add under spec:
                 "codecommit:Get*",
                 "codecommit:Describe*",
                 "codecommit:List*",
-                "codecommit:GitPull"
+                "codecommit:GitPull",
+                "codecommit:CreateRepository"
             ],
             "Resource": "*"
         },

@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "polaris-operator.fullname" . }}
+  labels:
+    app: {{ include "polaris-operator.name" . }}
+    chart: {{ include "polaris-operator.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "polaris-operator.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: polaris-operator
+      containers:
+      - name: polaris-operator
+        image: synthesis/polaris-operator:v1.0.0
+        imagePullPolicy: Always
+        args:
+          - /usr/local/bin/polaris-operator
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
