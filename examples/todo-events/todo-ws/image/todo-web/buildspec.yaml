@@ -5,10 +5,13 @@ phases:
       - $(aws ecr get-login --no-include-email)
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
       - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
+      - LATEST_URI="${REPOSITORY_URI}:latest"
   build:
     commands:
       - cd examples/todo-events/todo-ws/image/todo-web
       - docker build --tag "$IMAGE_URI" .
+      - docker build --tag "$LATEST_URI" .
   post_build:
     commands:
       - docker push "$IMAGE_URI"
+      - docker push "$LATEST_URI"
