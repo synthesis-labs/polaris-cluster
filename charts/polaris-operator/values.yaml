@@ -1,0 +1,4 @@
+replicas: 1
+image:
+  name: synthesis/polaris-operator
+  tag: latest
