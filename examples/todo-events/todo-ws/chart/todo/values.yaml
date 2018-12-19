@@ -20,25 +20,25 @@ web:
   replicas: 1
   host: todo.ref4.onlabs.cloud
   ci:
-    buildspec: examples/todo-events/todo-ws/image/todo-web/buildspec.yaml
+    dockerfilelocation: examples/todo-events/todo-ws/image/todo-web/
     containerrepository: todo-web
-    tag: NOT_USED
+    tag: v1.0.0
   image:
     repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-web
-    tag: 417407a0
+    tag: v1.0.0
     pullPolicy: Always
 
 services:
   ws-service:
     replicas: 1
     ci:
-      buildspec: examples/todo-events/todo-ws/image/todo-ws/buildspec.yaml
+      dockerfilelocation: examples/todo-events/todo-ws/image/todo-ws/
       containerrepository: todo-ws
-      tag: NOT_USED
+      tag: v1.0.0
     command: ["bin/TodoWsService"]
     image:
       repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-ws
-      tag: 417407a0
+      tag: v1.0.0
       pullPolicy: Always
     env:
       {}
@@ -46,13 +46,13 @@ services:
   item-service:
     replicas: 1
     ci:
-      buildspec: examples/todo-events/todo-ws/image/todo-ws/buildspec.yaml
+      dockerfilelocation: examples/todo-events/todo-ws/image/todo-ws/
       containerrepository: todo-item
-      tag: NOT_USED
+      tag: v1.0.0
     command: ["bin/TodoItemService"]
     image:
       repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-item
-      tag: 417407a0
+      tag: v1.0.0
       pullPolicy: Always
     env:
       todo_items_table: todo-items
@@ -61,13 +61,13 @@ services:
   list-service:
     replicas: 1
     ci:
-      buildspec: examples/todo-events/todo-ws/image/todo-ws/buildspec.yaml
+      dockerfilelocation: examples/todo-events/todo-ws/image/todo-ws/
       containerrepository: todo-list
-      tag: NOT_USED
+      tag: v1.0.0
     command: ["bin/TodoListService"]
     image:
       repository: 535282574996.dkr.ecr.eu-west-1.amazonaws.com/todo-list
-      tag: 417407a0
+      tag: v1.0.0
       pullPolicy: Always
     env:
       todo_lists_table: todo-lists

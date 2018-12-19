@@ -13,12 +13,12 @@ spec:
     branch: {{ .Values.buildpipeline.branch }}
   builds:
   - name: todo-web
-    buildspec: {{ .Values.web.ci.buildspec }}
+    dockerfilelocation: {{ .Values.web.ci.dockerfilelocation }}
     containerrepository: {{ .Values.web.ci.containerrepository }}
     tag: {{ .Values.web.ci.tag }}
 {{- range $service_name, $service_detail := $.Values.services }}
   - name: {{ $service_name }}
-    buildspec: {{ $service_detail.ci.buildspec }}
+    dockerfilelocation: {{ $service_detail.ci.dockerfilelocation }}
     containerrepository: {{ $service_detail.ci.containerrepository }}
     tag: {{ $service_detail.ci.tag }}
 {{- end}}
