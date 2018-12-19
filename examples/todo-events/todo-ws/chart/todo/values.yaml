@@ -18,7 +18,7 @@ buildpipeline:
 
 web:
   replicas: 1
-  host: todo.ref4.onlabs.cloud
+  host: todo.p1.s7s.cloud
   ci:
     dockerfilelocation: examples/todo-events/todo-ws/image/todo-web/
     containerrepository: todo-web
