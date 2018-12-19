@@ -81,7 +81,8 @@ class App extends Component {
   }
 
   connect() {
-    this.ws = new WebSocket('wss:///ws/updates');
+    const wsaddr = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws/updates"
+    this.ws = new WebSocket(wsaddr);
     this.ws.onmessage = evt => {
       // When we receive an update from the ws, we want to dispatch this
       // to the state store
