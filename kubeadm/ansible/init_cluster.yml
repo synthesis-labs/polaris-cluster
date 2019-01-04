@@ -1,0 +1,119 @@
+---
+- hosts: masters
+  tasks:
+  - name: Concatenate the hostnames
+    set_fact:
+      hostnames_string: "{{ hostnames_api | join('\n') }}"
+
+  - name: Create cloud config
+    copy:
+      dest: "/etc/kubernetes/cloud.config"
+      content: |
+        [Global]
+        user = {{cloudconfig_user}}
+        password = {{cloudconfig_password}}
+        port = {{cloudconfig_port}}
+        insecure-flag = {{cloudconfig_insecureflag}}
+        datacenters = {{cloudconfig_datacenters}}
+
+        [VirtualCenter {{cloudconfig_server1}}]
+
+        [Workspace]
+        server = {{cloudconfig_server1}}
+        datacenter = {{cloudconfig_datacenter1}}
+        default-datastore={{cloudconfig_defaultdatastore1}}
+        resourcepool-path={{cloudconfig_resourcepoolpath1}}
+        folder = {{cloudconfig_folder}}
+
+        [Disk]
+        scsicontrollertype = {{cloudconfig_scsicontrollertype}}
+
+        [Network]
+        public-network = {{cloudconfig_publicnetwork1}}
+
+        [VirtualCenter {{cloudconfig_server2}}]
+
+        [Workspace]
+        server = {{cloudconfig_server2}}
+        datacenter = {{cloudconfig_datacenter2}}
+        default-datastore={{cloudconfig_defaultdatastore2}}
+        resourcepool-path={{cloudconfig_resourcepoolpath2}}
+        folder = {{cloudconfig_folder}}
+
+        [Disk]
+        scsicontrollertype = {{cloudconfig_scsicontrollertype}}
+
+        [Network]
+        public-network = {{cloudconfig_publicnetwork2}}
+    become: true
+    
+  - name: Copy cluster config
+    copy:
+      dest: "./cluster-config.yaml"
+      content: |
+        apiVersion: kubeadm.k8s.io/v1alpha3
+        kind: ClusterConfiguration
+        kubernetesVersion: {{kubernetes_version}}
+        apiServerCertSANs: 
+        {{hostnames_string}}
+        controlPlaneEndpoint: "{{control_plane_endpoint}}"
+        etcd:
+          external:
+            endpoints:
+            - https://{{master0_url}}:2379
+            - https://{{master1_url}}:2379
+            - https://{{master2_url}}:2379
+            caFile: /etc/etcd/ca.pem
+            certFile: /etc/etcd/kubernetes.pem
+            keyFile: /etc/etcd/kubernetes-key.pem
+        networking:
+          podSubnet: "{{pod_subnet}}"
+        apiServerExtraArgs:
+          apiserver-count: "{{apiserver_count}}"
+    become: true
+
+- hosts: mainMaster
+  tasks:
+  - name: Init kubeadm
+    shell: kubeadm init --config=cluster-config.yaml
+    register: kubeadm_output
+    become: true
+  
+  - name: OUTPUT FROM KUBEADM
+    debug:
+      var: kubeadm_output
+    
+  - name: Copy pki to root
+    shell: cp -r  /etc/kubernetes/pki .
+    become: true
+
+  - name: tar pki
+    shell: tar -czf pki.tar ./pki
+    become: true
+    
+  - name: Copy pki to bastion
+    fetch: 
+      src: ./pki.tar
+      dest: ./
+      flat: yes
+
+- hosts: secondaryMasters
+  tasks:
+  - name: Copy pki to masters
+    copy:
+      src: ./pki.tar
+      dest: ~/pki.tar
+
+  - name: Untar pki
+    shell: tar -xzf pki.tar
+
+  - name: remove apiserver values
+    shell: rm ~/pki/apiserver.*
+
+  - name: move pki to etc/kubernetes/
+    shell: mv ./pki /etc/kubernetes/
+    become: true
+
+  - name: kubeadm init
+    shell: kubeadm init --config=cluster-config.yaml
+    become: true

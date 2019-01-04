@@ -1,0 +1,157 @@
+---
+- hosts: allnodes
+  tasks:
+  - name: Remove old Docker versions
+    yum:
+      name:
+        - docker
+        - docker-client
+        - docker-client-latest
+        - docker-common
+        - docker-latest
+        - docker-latest-logrotate
+        - docker-logrotate
+        - docker-selinux
+        - docker-engine-selinux
+        - docker-engine
+      state: absent
+    become: true
+  - name: Install Docker
+    yum:
+      name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-selinux-17.03.3.ce-1.el7.noarch.rpm
+    become: true
+  - yum:
+      name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.03.3.ce-1.el7.x86_64.rpm
+    become: true
+  - name: Start Docker
+    shell: systemctl start docker
+    become: true
+  - name: Enable Docker
+    shell: systemctl enable docker
+    become: true
+
+  - name: Create k8s repo file
+    copy:
+      dest: "/etc/yum.repos.d/kubernetes.repo"
+      content: |
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    become: true
+  - name: Install kubernetes tools
+    yum:
+      name: 
+        - kubelet-{{kubernetes_version}}
+        - kubeadm-{{kubernetes_version}}
+        - kubectl
+    become: true
+  - name: Enable Kubelet
+    shell: systemctl enable kubelet
+    become: true
+
+  - name: Install Yum Version Lock
+    yum:
+      name:
+        - yum-versionlock
+    become: true
+  - name: Lock Yum Packages
+    shell: yum versionlock add kubeadm kubelet docker etcd
+    become: true
+
+  - name: Set timezone
+    shell: timedatectl set-timezone America/New_York
+    become: true
+
+  - name: Set limits
+    blockinfile:
+      dest: "/etc/security/limits.conf"
+      content: |
+        * soft     nproc          131072    
+        * hard     nproc          131072  
+        * soft     nofile         131072  
+        * hard     nofile         131072
+        root soft     nproc          131072        
+        root hard     nproc          131072  
+        root soft     nofile         131072  
+        root hard     nofile         131072
+    become: true
+  - name: Default limit for number of user's processes to prevent
+    copy:
+      dest: "/etc/security/limits.d/90-nproc.conf"
+      content: |
+        *          soft    nproc     131072
+        root       soft    nproc     131072
+    become: true
+  - name: Applying ulimit 
+    shell: ulimit -n 131072
+    become: true
+  - name: Ulimit sanity
+    shell: ulimit -a
+    become: true
+
+  - name: Set k8s config
+    copy:
+      dest: "/etc/sysctl.d/k8s.conf"
+      content: |
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        fs.may_detach_mounts = 1
+    become: true
+  - name: Set sysctl.conf
+    blockinfile:
+      dest: "/etc/sysctl.conf"
+      content: |
+        fs.file-max = 131072
+        fs.may_detach_mounts = 1
+    become: true
+  - name: Apply sysctl config
+    shell: sysctl --system
+    become: true
+
+  - name: Turn off swap
+    shell: swapoff -a
+    become: true
+  - name: Clear swap
+    shell: sed -i '/ swap / s/^/#/' /etc/fstab warn=false
+    become: true
+
+  - name: Install and configure govc
+    shell: curl -L https://github.com/vmware/govmomi/releases/download/v0.19.0/govc_linux_amd64.gz | gunzip > /bin/govc
+    become: true
+  - file: dest=/bin/govc mode=+x
+    become: true
+
+  - name: Set GOVC credentials
+    blockinfile:
+      dest: "/etc/environment"
+      content: |
+        GOVC_URL={{govc_url}}
+        GOVC_USERNAME={{govc_user}}
+        GOVC_PASSWORD={{govc_pass}}
+        GOVC_INSECURE=1
+    become: true
+
+  - name: Sanity check govc
+    shell: govc about
+    become: true
+    register: about
+  - debug: 
+      var: about
+
+  - name: Sanity check govc
+    shell: govc datacenter.info
+    become: true
+    register: datacenter
+  - debug:
+      var: datacenter
+
+  - name: Sanity check govc
+    shell: govc device.info -vm vgtk8master01
+    become: true
+    register: device
+  - debug:
+      var: device

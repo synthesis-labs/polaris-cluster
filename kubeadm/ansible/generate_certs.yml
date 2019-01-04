@@ -1,0 +1,107 @@
+---
+- hosts: local
+  tasks:
+  - name: Create ca config
+    copy:
+      dest: "./ca-config.json"
+      content: |
+        {
+          "signing": {
+            "default": {
+              "expiry": "43800h"
+            },
+            "profiles": {
+              "kubernetes": {
+                "usages": ["signing", "key encipherment", "server auth", "client auth"],
+                "expiry": "43800h"
+              }
+            }
+          }
+        }
+
+  - name: Create ca csr
+    copy:
+      dest: "./ca-csr.json"
+      content: |
+        {
+          "CN": "kubernetes",
+          "key": {
+            "algo": "rsa",
+            "size": 2048
+          },
+          "names": [
+            {
+              "C": "US",
+              "L": "New York City",
+              "O": "Kubernetes",
+              "OU": "VG",
+              "ST": "New York"
+            }
+          ]
+        }
+
+  - name: Create cluster csr
+    copy:
+      dest: "./{{cluster_name}}-csr.json"
+      content: |
+        {
+          "CN": "kubernetes",
+          "key": {
+            "algo": "rsa",
+            "size": 2048
+          },
+          "names": [
+            {
+              "C": "US",
+              "L": "New York City",
+              "O": "Kubernetes",
+              "OU": "VG",
+              "ST": "New York"
+            }
+          ]
+        }
+
+  - name: Download cfssl
+    get_url:
+      url: https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+      dest: ./cfssl_linux-amd64
+
+  - name: Download cfssljson
+    get_url:
+      url: https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+      dest: ./cfssljson_linux-amd64
+
+  - name: Give cfssl permissions
+    file: dest=./cfssl_linux-amd64 mode=+x
+  - name: Give cfssljson permissions
+    file: dest=./cfssljson_linux-amd64 mode=+x
+
+  - name: Generate ca cert
+    shell: ./cfssl_linux-amd64 gencert -initca ca-csr.json | ./cfssljson_linux-amd64 -bare ca
+
+  - name: Concatenate the public keys
+    set_fact:
+      hostnames_string: "{{ hostnames | join(',') }}"
+
+  - debug:
+      var: hostnames_string
+
+  - name: Generate kubernetes cert
+    shell: ./cfssl_linux-amd64 gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname={{hostnames_string}} -profile={{cluster_name}} {{cluster_name}}-csr.json | ./cfssljson_linux-amd64 -bare {{cluster_name}}
+
+- hosts: allnodes
+  tasks:
+  - name: Copy ca.pem
+    copy:
+      src: ./ca.pem
+      dest: ~/ca.pem
+
+  - name: Copy kubernetes.pem
+    copy:
+      src: ./kubernetes.pem
+      dest: ~/kubernetes.pem
+
+  - name: Copy kubernetes-key.pem
+    copy:
+      src: ./kubernetes-key.pem
+      dest: ~/kubernetes-key.pem
