@@ -80,22 +80,43 @@ For a more detailed look at the Principles and Architecture of Polaris please vi
 
 You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/docs/aws.md) for more info.
 
-1. Generate the DEX Certificate Authority bits
+1. Install Helm, a package manager for Kubernetes
 
 ```
-$ k8/dex/gen-dex-ca.sh
+  The Helm client can be installed either from source, or from pre-built binary releases.
+  
+  From Snap(Linux)
+  $ sudo snap install helm --classic
+
+  macOS
+  $ brew install kubernetes-helm
+
+  From Chocolatey
+  $ choco install kubernetes-helm
 ```
 
-2. Create the cluster definition using kops
+2. Generate the DEX Certificate Authority bits
 
 ```
-$ k8/create-cluster.sh
+$ dex/gen-dex-ca.sh
 ```
 
-3. Edit the cluster to CA cert, OIDC and additional policies:
+3. Create SSH key that will be used by the Kubernetes cluster 
 
 ```
-$ kops edit cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
+$ ssh-keygen -t rsa
+```
+
+4. Create the cluster definition using kops
+
+```
+$ create-cluster.sh
+```
+
+5. Edit the cluster to CA cert, OIDC and additional policies:
+
+```
+$ kops edit cluster --state=s3://kops-state-bucket --name=example.cluster.k8s --yes
 
 Then add under spec:
   fileAssets:
@@ -103,7 +124,7 @@ Then add under spec:
     path: /srv/kubernetes/assets/dex-ca-cert.pem
     roles: [Master] # a list of roles to apply the asset to, zero defaults to all
     content: |
-      *<< CONTENTS OF k8/dex/ca/dex-ca-cert.pem >>*
+      *<< CONTENTS OF /dex/ca/dex-ca-cert.pem >>*
   kubeAPIServer:
     oidcIssuerURL: *<< URL FOR DEX HERE (eg. https://dex.example.cluster.k8s) >>*
     oidcClientID: kubectl-access
@@ -179,7 +200,37 @@ Then add under spec:
         }
       ]
 ```
-4. Edit the node instance group to enable spot instances (Optional - for running cheap).
+
+6. Edit polaris/values.yaml file to change the cluster name,region, etc.
+
+```
+Dex and Dex-k8s-authenticator:
+- enables RBAC for kubectl accsess (logs user into their cluster), gets the CA
+  cert from s3 after the cluster has been created.
+
+Cluster-autoscaler: 
+- automatically adjusts the size of a Kubernetes Cluster so that all pods have a
+  place to run and there are no unneeded nodes.
+
+nginx-ingress:
+- allows simple host or URL based HTTP routing.
+
+Flux:
+- watches the changes on ECR and communicates updates to cluster to be
+  deployed
+
+polaris-prometheus-operator:
+ - Installs prometheus-operator (https://github.com/coreos/prometheusoperator) to create/configure/manage Prometheus clusters atop Kubernetes (i.e.
+   The Prometheus Operator for Kubernetes provides easy monitoring definitions
+   for Kubernetes services and deployment and management of Prometheus instances.)
+
+charts/polaris:
+ - installs the addons with the predefined configurations from the helm
+   packages located in the same directory and customized with all the values above
+
+```
+
+7. Edit the node instance group to enable spot instances (Optional - for running cheap).
 
 ```
 $ kops edit ig nodes --state=s3://kops-state-bucket --name=example.cluster.k8s
@@ -190,7 +241,7 @@ Then add under spec:
   maxSize: 6
 ```
 
-5. Create the cluster.
+8. Create the cluster.
 
 ```
 Test run:
@@ -203,7 +254,7 @@ $ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s 
 $ watch -d 'kubectl get nodes -o wide; kubectl get pods --all-namespaces'
 ```
 
-6. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
+9. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
 
 ```
 $ kubectl create namespace polaris
@@ -216,17 +267,18 @@ $ helm upgrade --namespace polaris --install polaris-prometheus-operator charts/
 
 $ helm upgrade --namespace polaris --install polaris charts/polaris
 ```
-
-7. Setup DEX
+10. Setup DEX
 
 ```
 Install the dex certificates:
 
-$ kubectl create configmap dex-ca --namespace polaris --from-file dex-ca.pem=k8/dex/ca/dex-ca-cert.pem
 
-$ kubectl create secret tls dex-ca --namespace polaris --cert=k8/dex/ca/dex-ca-cert.pem --key=dex/ca/dex-ca-key.pem
 
-$ kubectl create secret tls dex-tls --namespace polaris --cert=k8/dex/ca/dex-issuer-cert.pem --key=dex/ca/dex-issuer-key.pem
+$ kubectl create configmap dex-ca --namespace polaris --from-file dex-ca.pem=dex/ca/dex-ca-cert.pem
+
+$ kubectl create secret tls dex-ca --namespace polaris --cert=dex/ca/dex-ca-cert.pem --key=dex/ca/dex-ca-key.pem
+
+$ kubectl create secret tls dex-tls --namespace polaris --cert=dex/ca/dex-issuer-cert.pem --key=dex/ca/dex-issuer-key.pem
 
 Hit dex on https://dex.example.cluster.k8s/.well-known/openid-configuration and ensure you get the dex-kube-issuer cert.
 
@@ -239,7 +291,7 @@ Install a clusterrole for the admin@example.com administrator:
 $ kubectl apply --namespace polaris -f k8/serviceaccounts/admin@example.com.yaml
 ```
 
-8. Login and get a kubectl token:
+11. Login and get a kubectl token:
 
 ```
 https://login.example.cluster.k8s
@@ -247,7 +299,7 @@ https://login.example.cluster.k8s
 Load up the kube-config as directed (maybe take a backup of existing!)
 ```
 
-9. Setup Flux for CD
+12. Setup Flux for CD
 
 ```
 Create a code-commit repo in AWS (manually for now...) - e.g. kubernetes-example-cluster.
@@ -286,7 +338,7 @@ Then to setup example as an automated deployment:
 $ fluxctl --k8s-fwd-ns polaris -n example automate -c example:fluxhelmrelease/example
 ```
 
-10. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
+13. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
 
 ```
 $ kubectl edit deployment daemonset cilium -n kube-system
@@ -299,7 +351,7 @@ to:
 Then delete every cilium pod (and have it restart).
 ```
 
-11. Install aws-service-operator (early beta, but cool for creating ECRs)
+14. Install aws-service-operator (early beta, but cool for creating ECRs)
 
 ```
 Edit values and make sure you have sane values:

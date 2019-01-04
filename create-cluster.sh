@@ -39,7 +39,7 @@ kops create cluster \
    --master-count ${MASTER_COUNT}  `# Number of masters` \
    `#--master-public-name           # Only useful for public masters` \
    `#--master-security-groups       # Existing SGs to apply to masters ` \
-   --master-size m3.medium         `# Instance type of masters` \
+   --master-size m4.large         `# Instance type of masters` \
    --master-tenancy default        `# [default | dedicated]` \
    --master-volume-size 30         `# Master volume size in GB` \
    --master-zones ${MASTER_ZONES}  `# Zones` \
