@@ -11,7 +11,7 @@
               "expiry": "43800h"
             },
             "profiles": {
-              "kubernetes": {
+              "{{cluster_name}}": {
                 "usages": ["signing", "key encipherment", "server auth", "client auth"],
                 "expiry": "43800h"
               }
@@ -24,7 +24,7 @@
       dest: "./ca-csr.json"
       content: |
         {
-          "CN": "kubernetes",
+          "CN": "{{cluster_name}}",
           "key": {
             "algo": "rsa",
             "size": 2048
@@ -34,7 +34,7 @@
               "C": "US",
               "L": "New York City",
               "O": "Kubernetes",
-              "OU": "VG",
+              "OU": "Synthesis",
               "ST": "New York"
             }
           ]
@@ -45,7 +45,7 @@
       dest: "./{{cluster_name}}-csr.json"
       content: |
         {
-          "CN": "kubernetes",
+          "CN": "{{cluster_name}}",
           "key": {
             "algo": "rsa",
             "size": 2048

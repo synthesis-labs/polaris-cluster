@@ -10,41 +10,6 @@
       dest: "/etc/kubernetes/cloud.config"
       content: |
         [Global]
-        user = {{cloudconfig_user}}
-        password = {{cloudconfig_password}}
-        port = {{cloudconfig_port}}
-        insecure-flag = {{cloudconfig_insecureflag}}
-        datacenters = {{cloudconfig_datacenters}}
-
-        [VirtualCenter {{cloudconfig_server1}}]
-
-        [Workspace]
-        server = {{cloudconfig_server1}}
-        datacenter = {{cloudconfig_datacenter1}}
-        default-datastore={{cloudconfig_defaultdatastore1}}
-        resourcepool-path={{cloudconfig_resourcepoolpath1}}
-        folder = {{cloudconfig_folder}}
-
-        [Disk]
-        scsicontrollertype = {{cloudconfig_scsicontrollertype}}
-
-        [Network]
-        public-network = {{cloudconfig_publicnetwork1}}
-
-        [VirtualCenter {{cloudconfig_server2}}]
-
-        [Workspace]
-        server = {{cloudconfig_server2}}
-        datacenter = {{cloudconfig_datacenter2}}
-        default-datastore={{cloudconfig_defaultdatastore2}}
-        resourcepool-path={{cloudconfig_resourcepoolpath2}}
-        folder = {{cloudconfig_folder}}
-
-        [Disk]
-        scsicontrollertype = {{cloudconfig_scsicontrollertype}}
-
-        [Network]
-        public-network = {{cloudconfig_publicnetwork2}}
     become: true
     
   - name: Copy cluster config
