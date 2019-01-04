@@ -371,6 +371,7 @@ $ ssh -i ~/.ssh/id_rsa admin@api.example.cluster.k8s
 ## Related Polaris Projects
 
 - The Polaris Operator Project https://github.com/synthesis-labs/polaris-operator
-
+- The Polaris CLI Project https://github.com/synthesis-labs/polaris-cli
+- The Polaris Scaffolds(List Of Published Polaris Scaffolds) https://github.com/synthesis-labs/polaris-scaffolds
 
 There's it!
