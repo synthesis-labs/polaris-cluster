@@ -3,7 +3,7 @@
   tasks:
   - name: Concatenate the hostnames
     set_fact:
-      hostnames_string: "{{ hostnames_api | join('\n') }}"
+      hostnames_string: "- {{ hostnames | join('\n') }}"
 
   - name: Create cloud config
     copy:
@@ -13,28 +13,9 @@
     become: true
     
   - name: Copy cluster config
-    copy:
+    template:
+      src: "./templates/cluster-config.j2"
       dest: "./cluster-config.yaml"
-      content: |
-        apiVersion: kubeadm.k8s.io/v1alpha3
-        kind: ClusterConfiguration
-        kubernetesVersion: {{kubernetes_version}}
-        apiServerCertSANs: 
-        {{hostnames_string}}
-        controlPlaneEndpoint: "{{control_plane_endpoint}}"
-        etcd:
-          external:
-            endpoints:
-            - https://{{master0_url}}:2379
-            - https://{{master1_url}}:2379
-            - https://{{master2_url}}:2379
-            caFile: /etc/etcd/ca.pem
-            certFile: /etc/etcd/kubernetes.pem
-            keyFile: /etc/etcd/kubernetes-key.pem
-        networking:
-          podSubnet: "{{pod_subnet}}"
-        apiServerExtraArgs:
-          apiserver-count: "{{apiserver_count}}"
     become: true
 
 - hosts: mainMaster

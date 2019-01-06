@@ -24,35 +24,6 @@
         server k8s-master-0 {{master0_url}}:{{master_api_port}} check fall 3 rise 2
         server k8s-master-1 {{master1_url}}:{{master_api_port}} check fall 3 rise 2
         server k8s-master-2 {{master2_url}}:{{master_api_port}} check fall 3 rise 2
-
-        frontend httpingress
-        bind 127.0.0.1:{{ingress_http_node_port}}
-        option tcplog
-        mode tcp
-        default_backend http-ingress-controllers
-
-        backend http-ingress-controllers
-        mode tcp
-        balance roundrobin
-        option tcp-check
-        server k8s-ingress-0 {{ingress0_url}}:{{ingress_http_port}} check fall 3 rise 2
-        server k8s-ingress-1 {{ingress1_url}}:{{ingress_http_port}} check fall 3 rise 2
-        server k8s-ingress-2 {{ingress2_url}}:{{ingress_http_port}} check fall 3 rise 2
-
-        frontend httpsingress
-        bind 127.0.0.1:{{ingress_https_node_port}}
-        option tcplog
-        mode tcp
-        default_backend https-ingress-controllers
-
-        backend https-ingress-controllers
-        mode tcp
-        balance roundrobin
-        option tcp-check
-        server k8s-ingress-0 {{ingress0_url}}:{{ingress_https_port}}check fall 3 rise 2
-        server k8s-ingress-1 {{ingress1_url}}:{{ingress_https_port}}check fall 3 rise 2
-        server k8s-ingress-2 {{ingress2_url}}:{{ingress_https_port}}check fall 3 rise 2
-
     become: true
   
   - name: Allow all ports

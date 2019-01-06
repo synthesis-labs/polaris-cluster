@@ -62,7 +62,7 @@ variable "aws_bastion_size" {
 variable "aws_kube_master_ips" {
   description = "Master Nodes Private IPs"
   type        = "list"
-  default     = ["172.26.22.120", "172.26.22.121", "172.26.22.122", "172.26.22.123", "172.26.22.124"]
+  default     = ["172.26.22.120", "172.26.22.121", "172.26.22.122"]
 }
 
 variable "aws_kube_master_size" {
@@ -96,4 +96,8 @@ variable "k8s_secure_api_port" {
 variable "default_tags" {
   description = "Default tags for all resources"
   type        = "map"
+  default     = { 
+                  Deployment = "Polaris"
+                  Git = "https://github.com/synthesis-labs/polaris"
+                }
 }
