@@ -5,7 +5,11 @@ Kubeadm does not provision infrastructure / cloud resources (unlike KOPS).
 For this reason, infrastrructure must be pre-previsioned.
 
 #### AWS Infrastructure
-
+Infrastructure for Kubeadm can be provisioned using terraform and AWS.
+```
+$ terraform init
+$ terraform apply
+```
 
 # Ansible Deployment Method
 #### Update Host Vars
