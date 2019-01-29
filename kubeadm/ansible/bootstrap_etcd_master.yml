@@ -1,0 +1,89 @@
+---
+- hosts: masters
+  tasks:
+  - name: Install wget
+    yum:
+      name: wget
+    become: true
+
+  - name: create etcd directories
+    file: dest="/var/lib/etcd" state=directory
+    become: true
+  - file: dest="/etc/etcd" state=directory
+    become: true
+
+  - name: move certs
+    shell: mv ./ca.pem ./kubernetes.pem ./kubernetes-key.pem /etc/etcd
+    become: true
+    ignore_errors: yes
+
+  - name: Download and install etcd
+    shell: wget https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz
+    become: true
+  - shell: tar xvzf etcd-v3.3.9-linux-amd64.tar.gz
+    become: true
+    ignore_errors: yes
+  - shell: mv etcd-v3.3.9-linux-amd64/etcd* /usr/local/bin/
+    become: true
+    ignore_errors: yes
+
+  - name: Concatenate the listen client urls
+    set_fact:
+      listen_client_urls_string: "{{ listen_client_urls | join(',') }}"
+
+  - name: Create initial cluster string
+    set_fact:
+      initial_cluster_string: "{{master0_url}}=https://{{master0_url}}:2380,{{master1_url}}=https://{{master1_url}}:2380,{{master2_url}}=https://{{master2_url}}:2380"
+
+  - name: Creating etcd.service file
+    copy:
+      dest: "/etc/systemd/system/etcd.service"
+      content: |
+        [Unit]
+        Description=etcd
+        Documentation=https://github.com/coreos
+
+        [Service]
+        ExecStart=/usr/local/bin/etcd \
+          --name {{name}} \
+          --cert-file=/etc/etcd/kubernetes.pem \
+          --key-file=/etc/etcd/kubernetes-key.pem \
+          --peer-cert-file=/etc/etcd/kubernetes.pem \
+          --peer-key-file=/etc/etcd/kubernetes-key.pem \
+          --trusted-ca-file=/etc/etcd/ca.pem \
+          --peer-trusted-ca-file=/etc/etcd/ca.pem \
+          --peer-client-cert-auth \
+          --client-cert-auth \
+          --initial-advertise-peer-urls {{initial_advertise_peer_url}} \
+          --listen-peer-urls {{listen_peer_url}} \
+          --listen-client-urls {{listen_client_urls_string}} \
+          --advertise-client-urls {{advertise_client_url}} \
+          --initial-cluster-token etcd-cluster-0 \
+          --initial-cluster {{initial_cluster_string}} \
+          --initial-cluster-state new \
+          --data-dir=/var/lib/etcd
+        Restart=on-failure
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+    become: true
+
+  - name: Reload daemon
+    shell: systemctl daemon-reload
+    become: true
+
+  - name: Enable etcd
+    shell: systemctl enable etcd
+    become: true
+
+  - name: Start etcd
+    shell: systemctl start etcd
+    become: true
+
+  - name: Print etcd status
+    shell: systemctl status etcd
+    become: true
+    register: status
+  - debug:
+      var: status

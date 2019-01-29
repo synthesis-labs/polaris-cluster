@@ -1,0 +1,49 @@
+---
+
+- hosts: allnodes
+  tasks:
+  - name: Install haproxy
+    yum: 
+      name: haproxy
+    become: true
+  
+  - name: Create haproxy config
+    copy:
+      dest: "/etc/haproxy/haproxy.cfg"
+      content: |
+        frontend kubernetes
+        bind {{control_plane_endpoint}}
+        option tcplog
+        mode tcp
+        default_backend kubernetes-master-nodes
+
+        backend kubernetes-master-nodes
+        mode tcp
+        balance roundrobin
+        option tcp-check
+        server k8s-master-0 {{master0_url}}:{{master_api_port}} check fall 3 rise 2
+        server k8s-master-1 {{master1_url}}:{{master_api_port}} check fall 3 rise 2
+        server k8s-master-2 {{master2_url}}:{{master_api_port}} check fall 3 rise 2
+    become: true
+  
+  - name: Allow all ports
+    seboolean:
+      name: haproxy_connect_any
+      state: yes
+      persistent: yes
+    become: true
+
+  - name: Restart haproxy
+    shell: systemctl restart haproxy
+    become: true
+
+  - name: Enable haproxy
+    shell: systemctl enable haproxy
+    become: true
+
+  - name: haproxy status
+    shell: systemctl status haproxy
+    register: status
+    become: true
+  - debug:
+      var: status

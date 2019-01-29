@@ -1,0 +1,21 @@
+apiVersion: kubeadm.k8s.io/v1alpha3
+kind: ClusterConfiguration
+kubernetesVersion: {{kubernetes_version}}
+apiServerCertSANs: 
+{% for number in range(hostnames | length) %}
+  - {{hostnames[number]}}
+{% endfor %}
+controlPlaneEndpoint: "{{control_plane_endpoint}}"
+etcd:
+  external:
+    endpoints:
+    - https://{{master0_url}}:2379
+    - https://{{master1_url}}:2379
+    - https://{{master2_url}}:2379
+    caFile: /etc/etcd/ca.pem
+    certFile: /etc/etcd/kubernetes.pem
+    keyFile: /etc/etcd/kubernetes-key.pem
+networking:
+  podSubnet: "{{pod_subnet}}"
+apiServerExtraArgs:
+  apiserver-count: "{{apiserver_count}}"

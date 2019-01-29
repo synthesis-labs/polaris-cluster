@@ -1,0 +1,65 @@
+---
+- hosts: masters
+  tasks:
+  - name: Concatenate the hostnames
+    set_fact:
+      hostnames_string: "- {{ hostnames | join('\n') }}"
+
+  - name: Create cloud config
+    copy:
+      dest: "/etc/kubernetes/cloud.config"
+      content: |
+        [Global]
+    become: true
+    
+  - name: Copy cluster config
+    template:
+      src: "./templates/cluster-config.j2"
+      dest: "./cluster-config.yaml"
+    become: true
+
+- hosts: mainMaster
+  tasks:
+  - name: Init kubeadm
+    shell: kubeadm init --config=cluster-config.yaml
+    register: kubeadm_output
+    become: true
+  
+  - name: OUTPUT FROM KUBEADM
+    debug:
+      var: kubeadm_output
+    
+  - name: Copy pki to root
+    shell: cp -r  /etc/kubernetes/pki .
+    become: true
+
+  - name: tar pki
+    shell: tar -czf pki.tar ./pki
+    become: true
+    
+  - name: Copy pki to bastion
+    fetch: 
+      src: ./pki.tar
+      dest: ./
+      flat: yes
+
+- hosts: secondaryMasters
+  tasks:
+  - name: Copy pki to masters
+    copy:
+      src: ./pki.tar
+      dest: ~/pki.tar
+
+  - name: Untar pki
+    shell: tar -xzf pki.tar
+
+  - name: remove apiserver values
+    shell: rm ~/pki/apiserver.*
+
+  - name: move pki to etc/kubernetes/
+    shell: mv ./pki /etc/kubernetes/
+    become: true
+
+  - name: kubeadm init
+    shell: kubeadm init --config=cluster-config.yaml
+    become: true

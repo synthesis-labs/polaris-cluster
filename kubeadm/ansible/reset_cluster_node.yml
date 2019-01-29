@@ -1,0 +1,73 @@
+---
+- hosts: allnodes
+  tasks:
+  - name: Running kubeadm reset
+    shell: yes | kubeadm reset
+    become: true
+  - name: Stopping Docker
+    shell: systemctl stop docker
+    become: true
+  - name: Stopping kubelet
+    shell: systemctl stop kubelet
+    become: true
+  - name: Removing kubernetes files
+    shell: rm -rf /etc/kubernetes/*
+    become: true
+  - name: Reloading daemon
+    shell: systemctl daemon-reload
+    become: true
+  - name: Remove HAProxy
+    yum:
+      name: haproxy
+      state: absent
+    become: true
+  - name: Remove HAProxy Config
+    shell: rm -rf /etc/haproxy
+    become: true
+  - name: Remove Kubelet
+    yum:
+      name: kubelet
+      state: absent
+    become: true
+  - name: Remove Kubeadm
+    yum:
+      name: kubeadm
+      state: absent
+    become: true
+  - name: Copying iptables
+    shell: cp /etc/sysconfig/iptables ./iptables.bac
+    become: true
+  - name: Copying iptables.save
+    shell: cp /etc/sysconfig/iptables.save ./iptables.save.bac
+    become: true
+  - name: Removing all iptable rules
+    shell: |
+      iptables -F
+      iptables -X
+      iptables -t nat -F
+      iptables -t nat -X
+      iptables -t mangle -F
+      iptables -t mangle -X
+      iptables -P INPUT ACCEPT
+      iptables -P FORWARD ACCEPT
+      iptables -P OUTPUT ACCEPT 
+    become: true
+ 
+- hosts: masters
+  tasks:
+  - name: Stopping etcd
+    shell: systemctl stop etcd
+    become: true
+  - name: Disabling etcd
+    shell: systemctl disable etcd
+    become: true
+  - name: Removing var/lib etcd files
+    shell: rm -rf /var/lib/etcd/*
+    become: true
+  - name: Removing systemd etcd files
+    shell: rm -f /etc/systemd/system/etcd*
+    become: true
+  - name: Reloading daemon
+    shell: systemctl daemon-reload
+    become: true
+
