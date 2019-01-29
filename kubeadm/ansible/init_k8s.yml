@@ -16,16 +16,20 @@
   tasks:
   - name: Apply overlay network
     shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"    
+    become: true
 
   - name: Apply storage
     shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/storage-class/vsphere/default.yaml
+    become: true
 
   - name: Enable admin RBAC for the default namespace 
     shell: kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+    become: true
 
   - name: Create token for workers
     shell: kubeadm token create --config=cluster-config.yaml
     register: worker_token
+    become: true
 
   - name: Create worker file
     copy:
