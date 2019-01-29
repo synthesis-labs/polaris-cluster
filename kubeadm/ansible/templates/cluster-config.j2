@@ -1,6 +1,7 @@
 apiVersion: kubeadm.k8s.io/v1alpha3
 kind: ClusterConfiguration
 kubernetesVersion: {{kubernetes_version}}
+clusterName: {{cluster_name}}
 apiServerCertSANs: 
 {% for number in range(hostnames | length) %}
   - {{hostnames[number]}}
@@ -13,8 +14,8 @@ etcd:
     - https://{{master1_url}}:2379
     - https://{{master2_url}}:2379
     caFile: /etc/etcd/ca.pem
-    certFile: /etc/etcd/kubernetes.pem
-    keyFile: /etc/etcd/kubernetes-key.pem
+    certFile: /etc/etcd/{{cluster_name}}.pem
+    keyFile: /etc/etcd/{{cluster_name}}-key.pem
 networking:
   podSubnet: "{{pod_subnet}}"
 apiServerExtraArgs:

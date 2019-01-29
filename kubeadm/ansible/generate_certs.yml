@@ -45,7 +45,7 @@
       dest: "./{{cluster_name}}-csr.json"
       content: |
         {
-          "CN": "{{cluster_name}}",
+          "CN": "kubernetes",
           "key": {
             "algo": "rsa",
             "size": 2048
@@ -98,10 +98,10 @@
 
   - name: Copy kubernetes.pem
     copy:
-      src: ./kubernetes.pem
-      dest: ~/kubernetes.pem
+      src: ./{{cluster_name}}.pem
+      dest: ~/{{cluster_name}}.pem
 
   - name: Copy kubernetes-key.pem
     copy:
-      src: ./kubernetes-key.pem
-      dest: ~/kubernetes-key.pem
+      src: ./{{cluster_name}}-key.pem
+      dest: ~/{{cluster_name}}-key.pem
