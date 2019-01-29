@@ -34,12 +34,6 @@
       name: kubeadm
       state: absent
     become: true
-  - name: Copying iptables
-    shell: cp /etc/sysconfig/iptables ./iptables.bac
-    become: true
-  - name: Copying iptables.save
-    shell: cp /etc/sysconfig/iptables.save ./iptables.save.bac
-    become: true
   - name: Removing all iptable rules
     shell: |
       iptables -F
