@@ -5,7 +5,7 @@
     become: true
 
   - name: copy kubeconfig
-    shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    shell: cp /etc/kubernetes/admin.conf $HOME/.kube/config
     become: true
 
   - name: set owner
