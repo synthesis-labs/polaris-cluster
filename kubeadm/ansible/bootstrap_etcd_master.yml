@@ -13,7 +13,7 @@
     become: true
 
   - name: move certs
-    shell: mv ./ca.pem ./kubernetes.pem ./kubernetes-key.pem /etc/etcd
+    shell: mv ./ca.pem ./{{cluster_name}}.pem ./{{cluster_name}}-key.pem /etc/etcd
     become: true
     ignore_errors: yes
 
@@ -46,10 +46,10 @@
         [Service]
         ExecStart=/usr/local/bin/etcd \
           --name {{name}} \
-          --cert-file=/etc/etcd/kubernetes.pem \
-          --key-file=/etc/etcd/kubernetes-key.pem \
-          --peer-cert-file=/etc/etcd/kubernetes.pem \
-          --peer-key-file=/etc/etcd/kubernetes-key.pem \
+          --cert-file=/etc/etcd/{{cluster_name}}.pem \
+          --key-file=/etc/etcd/{{cluster_name}}-key.pem \
+          --peer-cert-file=/etc/etcd/{{cluster_name}}.pem \
+          --peer-key-file=/etc/etcd/{{cluster_name}}-key.pem \
           --trusted-ca-file=/etc/etcd/ca.pem \
           --peer-trusted-ca-file=/etc/etcd/ca.pem \
           --peer-client-cert-auth \

@@ -14,7 +14,7 @@ variable "AWS_DEFAULT_REGION" {
 
 variable "aws_cluster_name" {
   description = "Name of AWS Cluster: Kubeadm defaults to 'kubernetes'"
-  default = "kubernetes"
+  default     = "kubernetes"
 }
 
 data "aws_ami" "distro" {
@@ -23,6 +23,7 @@ data "aws_ami" "distro" {
   filter {
     name   = "name"
     values = ["RHEL-7.5_HVM_GA-*"]
+
     #values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
   }
 
@@ -87,17 +88,20 @@ variable "aws_kube_worker_size" {
 */
 variable "aws_elb_api_port" {
   description = "Port for AWS ELB"
+  default     = 6443
 }
 
 variable "k8s_secure_api_port" {
   description = "Secure Port of K8S API Server"
+  default     = 6443
 }
 
 variable "default_tags" {
   description = "Default tags for all resources"
   type        = "map"
-  default     = { 
-                  Deployment = "Polaris"
-                  Git = "https://github.com/synthesis-labs/polaris"
-                }
+
+  default = {
+    Deployment = "Polaris"
+    Git        = "https://github.com/synthesis-labs/polaris"
+  }
 }
