@@ -43,8 +43,6 @@
         kind: JoinConfiguration
         nodeRegistration:
           criSocket: /var/run/dockershim.sock
-          kubeletExtraArgs:
-            cloud-provider: "vsphere"
         tlsBootstrapToken: {{worker_token.stdout}}
         token: {{worker_token.stdout}}
 
