@@ -88,10 +88,12 @@ variable "aws_kube_worker_size" {
 */
 variable "aws_elb_api_port" {
   description = "Port for AWS ELB"
+  default     = 6443
 }
 
 variable "k8s_secure_api_port" {
   description = "Secure Port of K8S API Server"
+  default     = 6443
 }
 
 variable "default_tags" {
