@@ -76,7 +76,7 @@ For a more detailed look at the Principles and Architecture of Polaris please vi
   * IAMFullAccess
   * AmazonS3FullAccess
   * AmazonVPCFullAccess
-  * AmazonRoute53
+  * AmazonRoute53FullAccess
 
 You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/docs/aws.md) for more info.
 
