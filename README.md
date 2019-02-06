@@ -197,6 +197,92 @@ Then add under spec:
               "s3:*"
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:*",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "firehose:*"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "codepipeline:*",
+                "iam:ListRoles",
+                "iam:PassRole",
+                "s3:CreateBucket",
+                "s3:GetBucketPolicy",
+                "s3:GetObject",
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "s3:PutBucketPolicy",
+                "codecommit:ListBranches",
+                "codecommit:ListRepositories",
+                "codedeploy:GetApplication",
+                "codedeploy:GetDeploymentGroup",
+                "codedeploy:ListApplications",
+                "codedeploy:ListDeploymentGroups",
+                "elasticbeanstalk:DescribeApplications",
+                "elasticbeanstalk:DescribeEnvironments",
+                "lambda:GetFunctionConfiguration",
+                "lambda:ListFunctions",
+                "opsworks:DescribeApps",
+                "opsworks:DescribeLayers",
+                "opsworks:DescribeStacks",
+                "cloudformation:DescribeStacks",
+                "cloudformation:ListChangeSets"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "codebuild:*",
+                "codecommit:GetBranch",
+                "codecommit:GetCommit",
+                "codecommit:GetRepository",
+                "codecommit:ListBranches",
+                "codecommit:ListRepositories",
+                "cloudwatch:GetMetricStatistics",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "events:DeleteRule",
+                "events:DescribeRule",
+                "events:DisableRule",
+                "events:EnableRule",
+                "events:ListTargetsByRule",
+                "events:ListRuleNamesByTarget",
+                "events:PutRule",
+                "events:PutTargets",
+                "events:RemoveTargets",
+                "logs:GetLogEvents",
+                "s3:GetBucketLocation",
+                "s3:ListAllMyBuckets"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "logs:DeleteLogGroup"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:*:*:log-group:/aws/codebuild/*:log-stream:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:PutParameter"
+            ],
+            "Resource": "arn:aws:ssm:*:*:parameter/CodeBuild/*"
         }
       ]
 ```
