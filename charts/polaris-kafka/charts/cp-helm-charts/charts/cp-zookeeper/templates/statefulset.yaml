@@ -24,6 +24,8 @@ spec:
         prometheus.io/port: {{ .Values.prometheus.jmx.port | quote }}
       {{- end }}
     spec:
+      nodeSelector:
+        beta.kubernetes.io/instance-type: r5.xlarge    
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

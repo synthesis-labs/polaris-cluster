@@ -58,8 +58,8 @@ ksql:
 ## You can list load balanced service endpoint, or list of all brokers (which is hard in K8s).  e.g.:
 ## bootstrapServers: "PLAINTEXT://dozing-prawn-kafka-headless:9092"
 kafka:
-  bootstrapServers: ""
+  bootstrapServers: "PLAINTEXT://polaris-kafka-cp-kafka:9092"
 
 ## e.g. gnoble-panther-cp-schema-registry:8081
 cp-schema-registry:
-  url: ""
+  url: "http://polaris-kafka-cp-schema-registry:8081"

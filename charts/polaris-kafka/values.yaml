@@ -12,11 +12,11 @@ cp-helm-charts:
     enabled: true
     resources:
       limits:
-        cpu: 1000m
-        memory: 1536Mi
+        cpu: 8000m
+        memory: 8192Mi
       requests:
-        cpu: 1000m
-        memory: 1256Mi
+        cpu: 4000m
+        memory: 4096Mi
   cp-schema-registry:
     enabled: true
     resources:

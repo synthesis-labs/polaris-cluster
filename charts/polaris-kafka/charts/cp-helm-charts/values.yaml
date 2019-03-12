@@ -3,21 +3,21 @@
 ## ------------------------------------------------------
 cp-zookeeper:
   enabled: true
-  servers: 3
+  servers: 6
   image: confluentinc/cp-zookeeper
   imageTag: 5.0.0
-  heapOptions: "-Xms512M -Xmx512M"
+  heapOptions: "-Xms1024M -Xmx1024M"
   persistence:
     enabled: true
     ## The size of the PersistentVolume to allocate to each Zookeeper Pod in the StatefulSet. For
     ## production servers this number should likely be much larger.
     ##
     ## Size for Data dir, where ZooKeeper will store the in-memory database snapshots.
-    dataDirSize: 5Gi
+    dataDirSize: 50Gi
     # dataDirStorageClass: ""
 
     ## Size for data log dir, which is a dedicated log device to be used, and helps avoid competition between logging and snaphots.
-    dataLogDirSize: 5Gi
+    dataLogDirSize: 50Gi
     # dataLogDirStorageClass: ""
   resources: {}
   ## If you do want to specify resources, uncomment the following lines, adjust them as necessary,
@@ -34,15 +34,15 @@ cp-zookeeper:
 ## ------------------------------------------------------
 cp-kafka:
   enabled: true
-  brokers: 3
+  brokers: 6
   image: confluentinc/cp-kafka
   imageTag: 5.0.0
-  heapOptions: "-Xms512M -Xmx512M"
+  heapOptions: "-Xms4096M -Xmx4096M"
   persistence:
     enabled: true
-    # storageClass: ""
-    size: 5Gi
-  resources: {}
+    storageClass: "st1"
+    size: 500Gi
+  resources:
   ## If you do want to specify resources, uncomment the following lines, adjust them as necessary,
   ## and remove the curly braces after 'resources:'
   #  limits:
