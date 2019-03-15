@@ -3,7 +3,7 @@
 ## ------------------------------------------------------
 cp-zookeeper:
   enabled: true
-  servers: 6
+  servers: 3
   image: confluentinc/cp-zookeeper
   imageTag: 5.0.0
   heapOptions: "-Xms1024M -Xmx1024M"
@@ -34,7 +34,7 @@ cp-zookeeper:
 ## ------------------------------------------------------
 cp-kafka:
   enabled: true
-  brokers: 6
+  brokers: 3
   image: confluentinc/cp-kafka
   imageTag: 5.0.0
   heapOptions: "-Xms4096M -Xmx4096M"
