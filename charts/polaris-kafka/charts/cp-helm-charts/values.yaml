@@ -37,7 +37,7 @@ cp-kafka:
   brokers: 3
   image: confluentinc/cp-kafka
   imageTag: 5.0.0
-  heapOptions: "-Xms4096M -Xmx4096M"
+  heapOptions: "-Xms8192M -Xmx8192M"
   persistence:
     enabled: true
     storageClass: "st1"

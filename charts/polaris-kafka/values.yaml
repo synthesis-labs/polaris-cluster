@@ -13,10 +13,10 @@ cp-helm-charts:
     resources:
       limits:
         cpu: 4000m
-        memory: 4096Mi
+        memory: 12000Mi
       requests:
         cpu: 2000m
-        memory: 2048Mi
+        memory: 8000Mi
   cp-schema-registry:
     enabled: true
     resources:
