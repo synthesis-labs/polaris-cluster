@@ -98,6 +98,8 @@ You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/
 2. Generate the DEX Certificate Authority bits
 
 ```
+# Edit the dex/gen-dex-ca.sh DNS.1 to your dex domain name
+
 $ dex/gen-dex-ca.sh
 ```
 
@@ -201,7 +203,31 @@ Then add under spec:
       ]
 ```
 
-6. Edit polaris/values.yaml file to change the cluster name,region, etc.
+6. Edit the node instance group to enable spot instances (Optional - for running cheap).
+
+```
+$ kops edit ig nodes --state=s3://kops-state-bucket --name=example.cluster.k8s
+
+Then add under spec:
+  maxPrice: "0.10"
+  minSize: 1
+  maxSize: 6
+```
+
+7. Create the cluster.
+
+```
+Test run:
+$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
+
+Apply changes:
+$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s --yes
+
+... wait for cluster to come up ...
+$ watch -d 'kubectl get nodes -o wide; kubectl get pods --all-namespaces'
+```
+
+8. Edit polaris/values.yaml file to change the cluster name,region, etc.
 
 ```
 Dex and Dex-k8s-authenticator:
@@ -230,44 +256,7 @@ charts/polaris:
 
 ```
 
-7. Edit the node instance group to enable spot instances (Optional - for running cheap).
-
-```
-$ kops edit ig nodes --state=s3://kops-state-bucket --name=example.cluster.k8s
-
-Then add under spec:
-  maxPrice: "0.10"
-  minSize: 1
-  maxSize: 6
-```
-
-8. Create the cluster.
-
-```
-Test run:
-$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
-
-Apply changes:
-$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s --yes
-
-... wait for cluster to come up ...
-$ watch -d 'kubectl get nodes -o wide; kubectl get pods --all-namespaces'
-```
-
-9. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
-
-```
-$ kubectl create namespace polaris
-
-$ kubectl apply -f k8/serviceaccounts/tiller-serviceaccount.yaml
-
-$ helm init --service-account helm-tiller --upgrade --debug --wait
-
-$ helm upgrade --namespace polaris --install polaris-prometheus-operator charts/prometheus-operator-0.0.29.tgz
-
-$ helm upgrade --namespace polaris --install polaris charts/polaris
-```
-10. Setup DEX
+9. Setup DEX
 
 ```
 Install the dex certificates:
@@ -286,10 +275,26 @@ Modify charts/dex-k8s-authenticator/values.yaml and ensure:
 1. CA certificate link is set to public in S3
 2. CA certificate contents exists in cacerts section (as base64 encoded value)
 
-Install a clusterrole for the admin@example.com administrator:
+Install a clusterrole for the admin@example.com administrator (Create new service account for users you've added):
 
 $ kubectl apply --namespace polaris -f k8/serviceaccounts/admin@example.com.yaml
 ```
+
+
+10. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
+
+```
+$ kubectl create namespace polaris
+
+$ kubectl apply -f serviceaccounts/tiller-serviceaccount.yaml
+
+$ helm init --service-account helm-tiller --upgrade --debug --wait
+
+$ helm upgrade --namespace polaris --install polaris-prometheus-operator charts/prometheus-operator-0.0.29.tgz
+
+$ helm upgrade --namespace polaris --install polaris charts/polaris
+```
+
 
 11. Login and get a kubectl token:
 
