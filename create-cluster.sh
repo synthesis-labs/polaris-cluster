@@ -8,7 +8,7 @@ MASTER_ZONES=${REGION}b
 CLUSTER_CIDR=10.0.0.0/20
 
 # Newer kernel version for cilium support
-IMAGE=595879546273/CoreOS-stable-1855.4.0-hvm
+IMAGE=595879546273/CoreOS-stable-2079.4.0-hvm
 
 MASTER_COUNT=1
 NODE_COUNT=3
