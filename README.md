@@ -14,7 +14,7 @@ ______   ____ |  | _____ _______|__| ______
 
 # Overview
 
-Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design. 
+Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design.
 
 Polaris has the following features:
 
@@ -84,7 +84,7 @@ You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/
 
 ```
   The Helm client can be installed either from source, or from pre-built binary releases.
-  
+
   From Snap(Linux)
   $ sudo snap install helm --classic
 
@@ -103,7 +103,7 @@ You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/
 $ dex/gen-dex-ca.sh
 ```
 
-3. Create SSH key that will be used by the Kubernetes cluster 
+3. Create SSH key that will be used by the Kubernetes cluster
 
 ```
 $ ssh-keygen -t rsa
@@ -234,7 +234,7 @@ Dex and Dex-k8s-authenticator:
 - enables RBAC for kubectl accsess (logs user into their cluster), gets the CA
   cert from s3 after the cluster has been created.
 
-Cluster-autoscaler: 
+Cluster-autoscaler:
 - automatically adjusts the size of a Kubernetes Cluster so that all pods have a
   place to run and there are no unneeded nodes.
 
@@ -364,6 +364,14 @@ Edit values and make sure you have sane values:
 $ helm install --name=aws-service-operator k8/charts/aws-service-operator
 
 Test that it's working by pushing an ECRRepository into the flux pipe or manually applying it - then login to AWS and list.
+```
+
+15. Install polaris-kafka
+
+```
+$ helm --name polaris-kafka-cp-kafka --namespace app install polaris-kafka/
+
+Deploy other containers to this namespace to interact with Kafka topics
 ```
 
 ## Other administrative stuff
